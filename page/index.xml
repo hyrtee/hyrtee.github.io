@@ -1,1 +1,62 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Hyrtee's Blog</title><link>https://hyrtee.github.io/page/</link><description>Recent content in Pages on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 23 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://hyrtee.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://hyrtee.github.io/about/</link><pubDate>Fri, 23 Jun 2023 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/about/</guid><description>Hyrtee Graduated from USTC 嵌入式系统软件工程师 知名动漫爱好者 技术宅 &amp;amp; 家里蹲 MARiA super fans 专业技术 Programming language C Bash Python Makefile Arm Trusted Firmware：Arm可信固件 bootloader相</description></item><item><title>Archives</title><link>https://hyrtee.github.io/archives/</link><pubDate>Fri, 23 Jun 2023 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://hyrtee.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/search/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Hyrtee's Blog</title><link>https://hyrtee.github.io/page/</link><description>Recent content in Pages on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 23 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://hyrtee.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://hyrtee.github.io/about/</link><pubDate>Fri, 23 Jun 2023 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/about/</guid><description>&lt;h1 id="hyrtee">Hyrtee&lt;/h1>
+&lt;ul>
+&lt;li>Graduated from USTC&lt;/li>
+&lt;li>嵌入式系统软件工程师&lt;/li>
+&lt;li>知名动漫爱好者&lt;/li>
+&lt;li>技术宅 &amp;amp; 家里蹲&lt;/li>
+&lt;li>MARiA super fans&lt;/li>
+&lt;/ul>
+&lt;h2 id="专业技术">专业技术&lt;/h2>
+&lt;ul>
+&lt;li>Programming language
+&lt;ul>
+&lt;li>C&lt;/li>
+&lt;li>Bash&lt;/li>
+&lt;li>Python&lt;/li>
+&lt;li>Makefile&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Arm Trusted Firmware：Arm可信固件
+&lt;ul>
+&lt;li>bootloader相关，提供了secure world software的参考实现&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Qemu
+&lt;ul>
+&lt;li>正在努力学习中。。。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Gdb
+&lt;ul>
+&lt;li>同上&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="兴趣爱好">兴趣爱好&lt;/h2>
+&lt;ul>
+&lt;li>动漫
+&lt;ul>
+&lt;li>国漫：包括但不限于斗破苍穹、完美世界、遮天、一念永恒等，反正好看的都看。&lt;/li>
+&lt;li>日漫：包括但不限于火影忍者、妖精的尾巴、黑色五叶草、鬼灭之刃、咒术回战、实力教室等&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>逛漫展
+&lt;ul>
+&lt;li>自从2023年6月23日第一次逛白马湖漫展后，我就暗暗下决心，每年至少逛一次，把自己认识的都合影一遍2333😏&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>跑步
+&lt;ul>
+&lt;li>以前跑，现在emmmm&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>哑铃
+&lt;ul>
+&lt;li>一对5.75kG，发现肩膀力量好小😭&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="感悟">感悟&lt;/h2>
+&lt;ul>
+&lt;li>生活很苦，但偶尔也不错&lt;/li>
+&lt;/ul></description></item><item><title>Archives</title><link>https://hyrtee.github.io/archives/</link><pubDate>Fri, 23 Jun 2023 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://hyrtee.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://hyrtee.github.io/search/</guid><description/></item></channel></rss>
