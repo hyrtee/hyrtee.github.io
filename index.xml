@@ -1,39 +1,473 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hyrtee's Blog</title><link>https://hyrtee.github.io/</link><description>Recent content on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 23 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://hyrtee.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Qemu通过9pfs实现宿主机文件共享</title><link>https://hyrtee.github.io/2023/qemu%E9%80%9A%E8%BF%879pfs%E5%AE%9E%E7%8E%B0%E5%AE%BF%E4%B8%BB%E6%9C%BA%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB/</link><pubDate>Sun, 18 Jun 2023 03:52:25 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu%E9%80%9A%E8%BF%879pfs%E5%AE%9E%E7%8E%B0%E5%AE%BF%E4%B8%BB%E6%9C%BA%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
-&lt;p>kernel开启相关配置项：&lt;/p>
-&lt;pre>&lt;code class="language-bash">CONFIG_9P_FS=y
-CONFIG_9P_FS_POSIX_ACL=y
-CONFIG_9P_FS_SECURITY=y
-CONFIG_NETWORK_FILESYSTEMS=y
-CONFIG_NET_9P=y
-CONFIG_NET_9P_DEBUG=y
-CONFIG_NET_9P_VIRTIO=y
-CONFIG_PCI=y
-CONFIG_PCI_HOST_COMMON=y
-CONFIG_PCI_HOST_GENERIC=y
-CONFIG_VIRTIO_PCI=y
-CONFIG_VIRTIO_BLK=y
-CONFIG_VIRTIO_NET=y
-CONFIG_VIRTIO_MMIO=y
-CONFIG_FUSE_FS=y
-CONFIG_VIRTIO_FS=y
-CONFIG_VIRTIO_INPUT=y
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hyrtee's Blog</title><link>https://hyrtee.github.io/</link><description>Recent content on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 24 Jun 2023 11:11:25 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>hugo+Stack 搭建个人博客</title><link>https://hyrtee.github.io/2023/start-blog/</link><pubDate>Sat, 24 Jun 2023 11:11:25 +0800</pubDate><guid>https://hyrtee.github.io/2023/start-blog/</guid><description>&lt;h2 id="搭建环境">搭建环境&lt;/h2>
+&lt;ul>
+&lt;li>操作系统：windows 10&lt;/li>
+&lt;li>开发工具：vscode、Git&lt;/li>
+&lt;/ul>
+&lt;h2 id="搭建思路">搭建思路&lt;/h2>
+&lt;p>使用四个仓库，管理Blog，分别是：&lt;/p>
+&lt;ol>
+&lt;li>源仓库：private，托管所有配置文件&lt;/li>
+&lt;li>发布仓库：public，托管Github pages内容仓库&lt;/li>
+&lt;li>主题仓库：public，托管当前使用的主题自定义内容&lt;/li>
+&lt;li>评论仓库：public，托管blog文章评论信息&lt;/li>
+&lt;/ol>
+&lt;p>使用Github Action：当源仓库有push时，自动生成静态页面到username.github.io域名下&lt;/p>
+&lt;h2 id="安装-hugo">安装 hugo&lt;/h2>
+&lt;p>由于Stack要求SCSS 和 TypeScript，所以需要下载extend版本：&lt;a class="link" href="https://github.com/gohugoio/hugo/releases" target="_blank" rel="noopener"
+>Releases · gohugoio/hugo · GitHub&lt;/a>&lt;/p>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-32-03-image.png?msec=1687566645923" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-32-03-image.png?msec=1687566645923"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>Stack要求hugo最低版本 → &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack/blob/master/theme.toml#L23" target="_blank" rel="noopener"
+>theme&amp;rsquo;s &lt;code>theme.toml&lt;/code> file&lt;/a>&lt;/p>
+&lt;p>安装完成后，重启terminal，check version：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-34-45-image.png?msec=1687566645915" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-34-45-image.png?msec=1687566645915"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="新建-site">新建 site&lt;/h2>
+&lt;p>选择 or 新建一个文件夹，用于管理自己的blog，作者使用的是&lt;code>D:\code\blog&lt;/code>新建site，拉取stack作为module：&lt;/p>
+&lt;pre>&lt;code class="language-bash">hugo new site hugostack
+cd hugostack
+git init
+git submodule add https://github.com/CaiJimmy/hugo-theme-stack/ themes/hugo-theme-stack
 &lt;/code>&lt;/pre>
-&lt;p>宿主机支持相关库&lt;/p>
-&lt;pre>&lt;code class="language-bash">sudo apt install -y libcap-dev
-sudo apt install -y libattr
-sudo apt install -y libattr-dev
+&lt;p>将themes/hugo-theme-stack/exampleSite子目录下的文件拷贝到根目录下：&lt;/p>
+&lt;pre>&lt;code class="language-bash">cp -r themes/hugo-theme-stack/exampleSite/* ./
+# 删除根目录下默认的配置文件，不同hugo版本各有不同：hugo.toml/config.yaml
+rm hugo.toml
 &lt;/code>&lt;/pre>
-&lt;p>qemu编译支持virtfs&lt;/p>
-&lt;pre>&lt;code class="language-bash">./configure --target-list=aarch64-softmmu --enable-kvm --enable-virtfs --enable-slirp --enable-debug
+&lt;p>尝试本地运行&lt;/p>
+&lt;pre>&lt;code class="language-bash">hugo server -D
 &lt;/code>&lt;/pre>
-&lt;h2 id="执行步骤">执行步骤&lt;/h2>
-&lt;p>path/to/share：设置成自己在宿主机的要共享的目录&lt;/p>
-&lt;pre>&lt;code class="language-bash">qemu-system-aarch64 \
--M virt,secure=on -m 4G -nographic \
--machine firmware=bl31.bin \
--fsdev local,id=shareid,path=/path/to/share,security_model=none \
--device virtio-9p-device,fsdev=shareid,mount_tag=share \
--device loader,addr=0x1002000000,file=tee.elf \
---kernel Image \
---initrd rootfs.cpio.gz
-&lt;/code>&lt;/pre></description></item></channel></rss>
+&lt;p>&lt;strong>bug 1&lt;/strong>：languages.en.description: custom params on the language top level is deprecated and will be removed in a future release.&lt;/p>
+&lt;pre>&lt;code class="language-typescript">WARN 2023/06/23 10:15:21 config: languages.en.description: custom params on the language top level is deprecated and will be removed in a future release. Put the value below [languages.en.params]. See https://gohugo.io/content-management/multilingual/#changes-in-hugo-01120
+Re-run Hugo with the flag --panicOnWarning to get a better error message.
+WARN 2023/06/23 10:15:21 config: languages.zh-cn.description: custom params on the language top level is deprecated and will be removed in a future release. Put the value below [languages.zh-cn.params]. See https://gohugo.io/content-management/multilingual/#changes-in-hugo-01120
+Re-run Hugo with the flag --panicOnWarning to get a better error message.
+WARN 2023/06/23 10:15:21 config: languages.ar.description: custom params on the language top level is deprecated and will be removed in a future release. Put th
+Re-run Hugo with the flag --panicOnWarning to get a better error message.
+&lt;/code>&lt;/pre>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-47-51-image.png?msec=1687566645925" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-47-51-image.png?msec=1687566645925"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;strong>解决&lt;/strong>：大致含义是新的hugo版本会逐渐舍弃自定义language参数，所以将config.yaml中的language中的title和description字段，以及语言ar去掉：&lt;/p>
+&lt;pre>&lt;code class="language-yaml">languages:
+en:
+languageName: English
+weight: 1
+zh-cn:
+languageName: 中文
+weight: 2
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>bug 2&lt;/strong>：error calling partial: partial &amp;ldquo;article/article.html&amp;rdquo; timed out after 30s. This is most likely due to infinite recursion. If this is just a slow template, you can try to increase the &amp;rsquo;timeout&amp;rsquo; config setting.&lt;/p>
+&lt;pre>&lt;code class="language-typescript">ERROR 2023/06/23 10:46:27 render of &amp;quot;home&amp;quot; failed: &amp;quot;D:\code\blog\hugostack\themes\hugo-theme-stack\layouts\index.html:9:15&amp;quot;: execute of template failed: template: index.html:9:15: executing &amp;quot;main&amp;quot; at &amp;lt;partial &amp;quot;article-li15: executing &amp;quot;main&amp;quot; at &amp;lt;partial &amp;quot;article-list/default&amp;quot; .&amp;gt;: error calling partial: &amp;quot;D:\code\blog\hugostack\themes\hugo-theme-stack\layouts\partials\article-list\default.html:3:rtials/article-list/default.html:3:7: execut7&amp;quot;: execute of template failed: template: partials/article-list/default.html:3:7: executing &amp;quot;partials/article-list/default.html&amp;quot; at &amp;lt;partial &amp;quot;article/components/header&amp;quot; .&amp;gt;: erricle\components\header.html:34:7&amp;quot;: execute oor calling partial: &amp;quot;D:\code\blog\hugostack\themes\hugo-theme-stack\layouts\partials\article\components\header.html:34:7&amp;quot;: execute of template failed: template: partials/articl.RelPermalink&amp;gt;: error calling partialCached:e/components/header.html:34:7: executing &amp;quot;partials/article/components/header.html&amp;quot; at &amp;lt;partialCached &amp;quot;article/components/details&amp;quot; . .RelPermalink&amp;gt;: error calling partialCached: config setting. partial &amp;quot;article/components/details&amp;quot; timed out after 30s. This is most likely due to infinite recursion. If this is just a slow template, you can try to increase the 'timeout' config setting. of template failed: template: _default/sing
+Built in 30147 ms nite recursion. If this is just a slow templ
+Error: error building site: render: failed to render pages: render of &amp;quot;page&amp;quot; failed: &amp;quot;D:\code\blog\hugostack\themes\hugo-theme-stack\layouts\_default\single.html:27:7&amp;quot;: execute of template failed: template: _default/single.html:27:7: executing &amp;quot;main&amp;quot; at &amp;lt;partial &amp;quot;article/article.html&amp;quot; .&amp;gt;: error calling partial: partial &amp;quot;article/article.html&amp;quot; timed out after 30s. This is most likely due to infinite recursion. If this is just a slow template, you can try to increase the 'timeout' config setting.
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>解决&lt;/strong>：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>首先，科学上网&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>其次，在根目录的config.yaml中添加timeout字段，默认是30s，增大到10m：&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-yaml"># large timeout
+timeout : &amp;quot;10m&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>success！&lt;/p>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-11-03-21-image.png?msec=1687566645915" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-11-03-21-image.png?msec=1687566645915"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="关联仓库">关联仓库&lt;/h2>
+&lt;p>本地已有源仓库和主题仓库，需要将其关联到远程：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>远程源仓库：新建一个，设置属性为private，如：/username/hugostack.git&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>远程主题仓库：fork之前submodule的主题仓库到自己的github&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-bash"># 关联到远程
+git remote add origin https://github.com/username/hugostack.git
+cd themes/hugo-theme-stack/
+git remote set-url origin https://github.com/username/hugo-theme-stack.git
+&lt;/code>&lt;/pre>
+&lt;p>测试push&lt;/p>
+&lt;pre>&lt;code class="language-bash">git push -u origin master
+cd themes/hugo-theme-stack/
+git push
+&lt;/code>&lt;/pre>
+&lt;h2 id="设置github-action">设置Github Action&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>远程新建发布仓库，命名为：&lt;strong>username&lt;/strong>.github.io。这里的username是github的用户名，必须保持一致！&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>本地源仓库下：&lt;/p>
+&lt;ol>
+&lt;li>设置config.yaml中的baseurl为：https://username.github.io&lt;/li>
+&lt;li>新建文件夹和文件：.github/workflows/deploy-site.yaml，填入如下内容：&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-yaml">name: deploy
+on:
+push:
+branches: [&amp;quot;master&amp;quot;]
+workflow_dispatch:
+# schedule:
+# # Runs everyday at 8:00 AM
+# - cron: &amp;quot;0 0 * * *&amp;quot;
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+contents: read
+pages: write
+id-token: write
+# Allow one concurrent deployment
+concurrency:
+group: &amp;quot;pages&amp;quot;
+cancel-in-progress: true
+# Default to bash
+defaults:
+run:
+shell: bash
+jobs:
+# BUild job
+build:
+runs-on: ubuntu-latest
+env:
+HUGO_VERSION: 0.113.0
+TZ: America/Los_Angeles
+steps:
+- name: Checkout
+uses: actions/checkout@v3
+with:
+submodules: true # Fetch Hugo themes (true OR recursive)
+fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
+- name: Setup Hugo
+id: pages
+uses: peaceiris/actions-hugo@v2
+with:
+hugo-version: '0.113.0'
+extended: true
+- name: Build Hugo
+env:
+# For maximum backward compatibility with Hugo modules
+HUGO_ENVIRONMENT: production
+HUGO_ENV: production
+run: hugo --minify
+- name: Deploy Web
+id: deployment
+uses: peaceiris/actions-gh-pages@v3
+with:
+PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+EXTERNAL_REPOSITORY: hyrtee/hyrtee.github.io
+PUBLISH_BRANCH: main
+PUBLISH_DIR: ./public
+commit_message: ${{ github.event.head_commit.message }}
+&lt;/code>&lt;/pre>
+&lt;p>push到远程&lt;/p>
+&lt;p>&lt;strong>bug 3&lt;/strong>：refusing to allow an OAuth App to create or update workflow &lt;code>.github/workflows/deploy-site.yaml&lt;/code> without &lt;code>workflow&lt;/code> scope&lt;/p>
+&lt;p>&lt;strong>解决&lt;/strong>：暂时删除本地的.github/workflows/deploy-site.yaml，包括文件夹，先将其他修改push到远程，随后在github源仓库的Action页面下，新建一个workflows，将上面的deploy-site.yaml内容粘贴到其中。&lt;/p>
+&lt;p>&lt;strong>bug 4&lt;/strong>：执行Action失败，Action failed with &amp;ldquo;not found deploy key or tokens&amp;rdquo;&lt;/p>
+&lt;p>&lt;strong>解决&lt;/strong>：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>新建一个token，enable repo和workflow，复制token。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在源仓库的&lt;code>Settings - Secrets and variables - Actions&lt;/code>中，添加一个secret，将之前新建的token复制其中&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Action下rerun之前的job：&lt;/p>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-14-08-26-image.png?msec=1687566645924" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-14-08-26-image.png?msec=1687566645924"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-14-08-59-image.png?msec=1687566645923" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-14-08-59-image.png?msec=1687566645923"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>访问https://hyrtee.github.io/，success！&lt;/p>
+&lt;h2 id="自定义-blog-style">自定义 Blog Style&lt;/h2>
+&lt;h3 id="左侧信息栏">左侧信息栏&lt;/h3>
+&lt;h4 id="头像">头像&lt;/h4>
+&lt;p>根目录下新建assets/img，添加自己的头像img，随后修改对应config文件的img名称：src&lt;/p>
+&lt;pre>&lt;code class="language-yaml"> sidebar:
+emoji: 🍥
+subtitle: MARiA? yyds!
+avatar:
+enabled: true
+local: true
+src: img/avatar.png
+&lt;/code>&lt;/pre>
+&lt;h4 id="社交social">社交social&lt;/h4>
+&lt;p>自定义图标，&lt;a class="link" href="https://www.iconfont.cn/" target="_blank" rel="noopener"
+>iconfont&lt;/a> 下载，颜色#2c3e50，大小24，格式svg。下载后放到assets\icons&lt;/p>
+&lt;pre>&lt;code class="language-yaml">social:
+- identifier: github
+name: GitHub
+url: https://github.com/hyrtee
+weight: 1
+params:
+icon: img-name
+&lt;/code>&lt;/pre>
+&lt;p>注意：将下载的img中的svg的所有#2c3e50改成currentColor，否则切换为黑色模式，图标颜色不能自动切换，因为优先使用内部定义的color&lt;/p>
+&lt;h3 id="文档">文档&lt;/h3>
+&lt;h4 id="emoji">Emoji&lt;/h4>
+&lt;p>config中添加如下内容&lt;/p>
+&lt;pre>&lt;code class="language-yaml"># Enable global emoji support
+enableEmoji: true
+&lt;/code>&lt;/pre>
+&lt;p>随后直接在文章的md文档中添加emoji id即可显示，查询id：[emoji-cheat-sheet](&lt;a class="link" href="https://www.webfx.com/tools/emoji-cheat-sheet/" target="_blank" rel="noopener"
+>🎁 Emoji cheat sheet for GitHub, Basecamp, Slack &amp;amp; more&lt;/a>)&lt;/p>
+&lt;h4 id="language">Language&lt;/h4>
+&lt;p>如果只想保持一种语言，则config中的language只保留一种语言，如中文：&lt;/p>
+&lt;pre>&lt;code class="language-yaml">languages:
+zh-cn:
+languageName: 中文
+weight: 1
+&lt;/code>&lt;/pre>
+&lt;h3 id="评论">评论&lt;/h3>
+&lt;p>使用utterances，操作简单：&lt;/p>
+&lt;ol>
+&lt;li>github新建一个评论仓库hyrteeblogtalks&lt;/li>
+&lt;li>github安装&lt;a class="link" href="https://github.com/apps/utterances" target="_blank" rel="noopener"
+>utterances&lt;/a>，并关联上面的评论仓库&lt;/li>
+&lt;li>修改config.yaml&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-yaml"> comments:
+enabled: true
+provider: utterances
+disqusjs:
+shortname:
+apiUrl:
+apiKey:
+admin:
+adminLabel:
+utterances:
+repo: hyrtee/hyrteeblogtalks
+issueTerm: title
+theme: github-light
+&lt;/code>&lt;/pre>
+&lt;p>效果：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-26-55.png" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-26-55.png"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h3 id="统计分析">统计分析&lt;/h3>
+&lt;p>使用不蒜子工具，使用简单，只需导入两行代码，官网是这么说的，实际DIY也还行。&lt;/p>
+&lt;h4 id="导入busuanzi-js脚本">导入busuanzi js脚本&lt;/h4>
+&lt;p>在&lt;code>layouts\partials\head\head.html&lt;/code>文件末尾：&lt;/p>
+&lt;pre>&lt;code class="language-js">&amp;lt;!-- busuanzi --&amp;gt;
+{{- if .Site.Params.busuanzi.enable -}}
+&amp;lt;script async src=&amp;quot;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;meta name=&amp;quot;referrer&amp;quot; content=&amp;quot;no-referrer-when-downgrade&amp;quot;&amp;gt;
+{{- end -}}
+&lt;/code>&lt;/pre>
+&lt;h4 id="全局统计">全局统计&lt;/h4>
+&lt;p>底部显示本站总访问量和访客数，在&lt;code>layouts\partials\footer\footer.html&lt;/code>文件：&lt;/p>
+&lt;pre>&lt;code class="language-html">&amp;lt;section class=&amp;quot;copyright&amp;quot;&amp;gt;
+&amp;amp;copy;
+&amp;lt;!-- {{ if and (.Site.Params.footer.since) (ne .Site.Params.footer.since (int (now.Format &amp;quot;2006&amp;quot;))) }}
+{{ .Site.Params.footer.since }} -
+{{ end }} --&amp;gt;
+{{ now.Format &amp;quot;2006&amp;quot; }} &amp;lt;a href=&amp;quot;https://stack-theme-mod.vercel.app/&amp;quot;&amp;gt;Hyrtee&amp;lt;/a&amp;gt;&amp;lt;i class=&amp;quot;fas fa-bell&amp;quot;&amp;gt;&amp;lt;/i&amp;gt; ·&amp;lt;i class=&amp;quot;fas fa-bell&amp;quot;&amp;gt;&amp;lt;/i&amp;gt; &amp;lt;a id=&amp;quot;days&amp;quot;&amp;gt;0&amp;lt;/a&amp;gt;Days&amp;lt;br&amp;gt;
+{{$var := $scratch.Get &amp;quot;total&amp;quot;}}{{$var = div $var 100.0}}{{$var = math.Ceil $var}}{{$var = div $var 10.0}}共书写了{{$var}}k字·共 {{ len (where .Site.RegularPages &amp;quot;Section&amp;quot; &amp;quot;post&amp;quot;) }}篇文章
+&amp;lt;!-- 以上是文件原内容，以下是添加部分 --&amp;gt;
+&amp;lt;!-- insert busuanzi --&amp;gt;
+{{ if .Site.Params.busuanzi.enable -}}
+&amp;lt;div class=&amp;quot;busuanzi-footer&amp;quot;&amp;gt;
+&amp;lt;span id=&amp;quot;busuanzi_container_site_pv&amp;quot;&amp;gt;
+本站总访问量&amp;lt;span id=&amp;quot;busuanzi_value_site_pv&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;次
+&amp;lt;/span&amp;gt;
+&amp;lt;span id=&amp;quot;busuanzi_container_site_uv&amp;quot;&amp;gt;
+本站访客数&amp;lt;span id=&amp;quot;busuanzi_value_site_uv&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;人次
+&amp;lt;/span&amp;gt;
+&amp;lt;/div&amp;gt;
+{{- end -}}
+&amp;lt;/section&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;p>效果：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-03-20.png" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-03-20.png"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h4 id="单个文章统计">单个文章统计&lt;/h4>
+&lt;p>头部显示文章阅读量，&lt;code>layouts\partials\article\components\details.html&lt;/code>文件的footer内结尾：&lt;/p>
+&lt;pre>&lt;code class="language-html">{{ if .Site.Params.article.readingTime }}
+&amp;lt;div&amp;gt;
+{{ partial &amp;quot;helper/icon&amp;quot; &amp;quot;clock&amp;quot; }}
+&amp;lt;time class=&amp;quot;article-words&amp;quot;&amp;gt;
+{{ .WordCount }}字
+&amp;lt;/time&amp;gt;
+&amp;lt;/div&amp;gt;
+{{ end }}
+&amp;lt;!-- 以上是文件原内容，以下是添加部分 --&amp;gt;
+&amp;lt;!-- busuanzi --&amp;gt;
+{{ if .Site.Params.busuanzi.enable -}}
+&amp;lt;div class=&amp;quot;article-analysic&amp;quot;&amp;gt;&amp;amp;nbsp
+&amp;lt;!-- 这里的read图标，可自行前往iconfont下载 --&amp;gt;
+{{ partial &amp;quot;helper/icon&amp;quot; &amp;quot;read&amp;quot; }}
+&amp;lt;time class=&amp;quot;article-words&amp;quot;&amp;gt;
+&amp;lt;span id=&amp;quot;busuanzi_container_page_pv&amp;quot;&amp;gt;&amp;lt;span id=&amp;quot;busuanzi_value_page_pv&amp;quot;&amp;gt;&amp;lt;/span&amp;gt; &amp;amp;nbsp阅读&amp;lt;/span&amp;gt;
+&amp;lt;/time&amp;gt;
+&amp;lt;/div&amp;gt;
+{{- end }}
+&lt;/code>&lt;/pre>
+&lt;blockquote>
+&lt;ol>
+&lt;li>原版可能需要在themes/stack/layouts/_default/single.html中修改&lt;/li>
+&lt;li>技巧：无论使用什么版本的stack，默认情况下，单篇文章顶部都会显示字数或需要阅读几分钟，所以vscode搜&amp;quot;字&amp;quot;或&amp;quot;分钟&amp;quot;等关键字，看对应代码在哪个文件，就在哪里添加以上代码，屡试不爽！&lt;/li>
+&lt;/ol>
+&lt;/blockquote>
+&lt;p>效果：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-03-58.png" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-03-58.png"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>## 让谷歌&amp;amp;百度搜到我&lt;/p>
+&lt;p>### 谷歌&lt;/p>
+&lt;h4 id="获取谷歌分析id">获取谷歌分析ID&lt;/h4>
+&lt;p>首先前往&lt;a class="link" href="https://analytics.google.com/analytics/web/provision/#/provision" target="_blank" rel="noopener"
+>谷歌分析官网&lt;/a>，获取Measurement ID，具体操作跟随网站指引即可，名称随意，最终获得一个G-开头的Measurement ID。
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-15-53-46.png" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-15-53-46.png"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>
+打开config.yaml配置文件，找到googleAnalytics配置项，填入你的Measurement ID。&lt;/p>
+&lt;h4 id="提交站点地图">提交站点地图&lt;/h4>
+&lt;p>站点地图(sitemap)一般是一个XML文件，就是告诉搜索引擎，你的网站有哪些页面，让他来爬取你。Hugo会在生成和部署网站时在public文件夹根目录下自动生成sitemap.xml文件。&lt;/p>
+&lt;p>登录&lt;a class="link" href="https://search.google.com/search-console" target="_blank" rel="noopener"
+>谷歌搜索控制台&lt;/a>。在验证所有权的选项中选择“Google Analytics”。&lt;/p>
+&lt;p>然后点击侧边栏的【站点地图】页面就可以提交我们主页的站点地图URL:
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-15-58-33.png" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-15-58-33.png"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>### 百度&lt;/p>
+&lt;h4 id="获取js脚本">获取js脚本&lt;/h4>
+&lt;p>登陆&lt;a class="link" href="https://tongji.baidu.com" target="_blank" rel="noopener"
+>百度统计主页&lt;/a> ，按照指引，添加网站、获取统计代码。将代码放到&lt;code>themes/hugo-theme-stack/layouts/partials/head/head.html&lt;/code>最后，一次性安装，全站皆可被搜索到。如作者：&lt;/p>
+&lt;pre>&lt;code class="language-js">&amp;lt;script&amp;gt;
+var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement(&amp;quot;script&amp;quot;);
+hm.src = &amp;quot;https://hm.baidu.com/hm.js?c376f3e13b35b80fa5d4695e8dd859b1&amp;quot;;
+var s = document.getElementsByTagName(&amp;quot;script&amp;quot;)[0];
+s.parentNode.insertBefore(hm, s);
+})();
+&amp;lt;/script&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h4 id="提交站点视图">提交站点视图&lt;/h4>
+&lt;ol>
+&lt;li>登陆&lt;a class="link" href="https://ziyuan.baidu.com/dashboard/index" target="_blank" rel="noopener"
+>百度搜索资源平台&lt;/a>&lt;/li>
+&lt;li>添加站点，下载验证文件，然后把验证文件放在网站public文件夹内。点击“验证”即可。&lt;/li>
+&lt;li>选择左侧菜单→普通收录→sitemap→提交站点地图URL&lt;/li>
+&lt;/ol>
+&lt;p>可能由于博客刚建立，被认为是低质站点，过几天再来看看。。。😭😭😭&lt;/p>
+&lt;p>&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-31-33-image.png?msec=1687566693147" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-31-33-image.png?msec=1687566693147"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>## 使用魔改的stack
+偶然发现一个使用stack的博主使用了某位大佬的&lt;a class="link" href="https://github.com/Mantyke/Hugo-stack-theme-mod" target="_blank" rel="noopener"
+>魔改stack版本&lt;/a>，觉得还不错，就升级了一下。相比之前，有以下变化：&lt;/p>
+&lt;ul>
+&lt;li>调整文章页面为三栏显示（代码来自&lt;a class="link" href="https://github.com/ShadowySpirits/hugo-theme-stack" target="_blank" rel="noopener"
+>ShadowySpirits&lt;/a>）&lt;/li>
+&lt;li>文章按年份分类&lt;/li>
+&lt;li>增加文章字数统计与站点总字数、总篇数显示&lt;/li>
+&lt;li>修改全站字体为思源宋体&lt;/li>
+&lt;li>增加一个引用短代码（短代码来自&lt;a class="link" href="https://guanqr.com/" target="_blank" rel="noopener"
+>荷戟独彷徨&lt;/a>）&lt;/li>
+&lt;li>添加一个友情链接页面并设置为双栏（友情链接代码来自Bore，双栏代码来自BB_Roin）&lt;/li>
+&lt;li>一系列基于个人美观喜好的CSS修改&lt;/li>
+&lt;li>右侧栏增加Categories小部件&lt;/li>
+&lt;/ul>
+&lt;p>仓库的readme已说明需要修改的点，如头像和底部博客创建天数等。
+作者直接替换掉content，按照readme说明修改。
+&lt;strong>bug 5&lt;/strong>：小改之后，出现底部部分信息不显示问题：&lt;/p>
+&lt;p>原版：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-50-53-image.png?msec=1687567853625" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-50-53-image.png?msec=1687567853625"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>魔改版：
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-48-39-image.png?msec=1687567719717" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-48-39-image.png?msec=1687567719717"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;strong>解决&lt;/strong>：直接替换themes/下的stack为之前的最新版本，若文件夹名称修改，需要同步到config.yaml中开头的theme字段
+&lt;figure
+>
+&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-52-37-image.png?msec=1687567957684" >
+&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-52-37-image.png?msec=1687567957684"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p></description></item></channel></rss>
