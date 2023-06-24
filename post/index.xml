@@ -1,4 +1,42 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 24 Jun 2023 11:11:25 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>hugo+Stack 搭建个人博客</title><link>https://hyrtee.github.io/2023/start-blog/</link><pubDate>Sat, 24 Jun 2023 11:11:25 +0800</pubDate><guid>https://hyrtee.github.io/2023/start-blog/</guid><description>&lt;h2 id="搭建环境">搭建环境&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 24 Jun 2023 18:25:36 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
+&lt;p>kernel开启相关配置项：&lt;/p>
+&lt;pre>&lt;code class="language-bash">CONFIG_9P_FS=y
+CONFIG_9P_FS_POSIX_ACL=y
+CONFIG_9P_FS_SECURITY=y
+CONFIG_NETWORK_FILESYSTEMS=y
+CONFIG_NET_9P=y
+CONFIG_NET_9P_DEBUG=y
+CONFIG_NET_9P_VIRTIO=y
+CONFIG_PCI=y
+CONFIG_PCI_HOST_COMMON=y
+CONFIG_PCI_HOST_GENERIC=y
+CONFIG_VIRTIO_PCI=y
+CONFIG_VIRTIO_BLK=y
+CONFIG_VIRTIO_NET=y
+CONFIG_VIRTIO_MMIO=y
+CONFIG_FUSE_FS=y
+CONFIG_VIRTIO_FS=y
+CONFIG_VIRTIO_INPUT=y
+&lt;/code>&lt;/pre>
+&lt;p>宿主机支持相关库&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt install -y libcap-dev
+sudo apt install -y libattr
+sudo apt install -y libattr-dev
+&lt;/code>&lt;/pre>
+&lt;p>qemu编译支持virtfs&lt;/p>
+&lt;pre>&lt;code class="language-bash">./configure --target-list=aarch64-softmmu --enable-kvm --enable-virtfs --enable-slirp --enable-debug
+&lt;/code>&lt;/pre>
+&lt;h2 id="执行步骤">执行步骤&lt;/h2>
+&lt;p>path/to/share：设置成自己在宿主机的要共享的目录&lt;/p>
+&lt;pre>&lt;code class="language-bash">qemu-system-aarch64 \
+-M virt,secure=on -m 4G -nographic \
+-machine firmware=bl31.bin \
+-fsdev local,id=shareid,path=/path/to/share,security_model=none \
+-device virtio-9p-device,fsdev=shareid,mount_tag=share \
+-device loader,addr=0x1002000000,file=tee.elf \
+--kernel Image \
+--initrd rootfs.cpio.gz
+&lt;/code>&lt;/pre></description></item><item><title>hugo+Stack 搭建个人博客</title><link>https://hyrtee.github.io/2023/start-blog/</link><pubDate>Sat, 24 Jun 2023 11:11:25 +0800</pubDate><guid>https://hyrtee.github.io/2023/start-blog/</guid><description>&lt;h2 id="搭建环境">搭建环境&lt;/h2>
 &lt;ul>
 &lt;li>操作系统：windows 10&lt;/li>
 &lt;li>开发工具：vscode、Git&lt;/li>
@@ -16,9 +54,16 @@
 &lt;p>由于Stack要求SCSS 和 TypeScript，所以需要下载extend版本：&lt;a class="link" href="https://github.com/gohugoio/hugo/releases" target="_blank" rel="noopener"
 >Releases · gohugoio/hugo · GitHub&lt;/a>&lt;/p>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 262;
+flex-basis: 630px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-32-03-image.png?msec=1687566645923" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-32-03-image.png?msec=1687566645923"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-32-03-image.png" data-size="1191x453">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-32-03-image.png"
+width="1191"
+height="453"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-32-03-image_hu138801105249b0db336029e6526f5e62_68521_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-10-32-03-image_hu138801105249b0db336029e6526f5e62_68521_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -27,9 +72,16 @@ loading="lazy"
 >theme&amp;rsquo;s &lt;code>theme.toml&lt;/code> file&lt;/a>&lt;/p>
 &lt;p>安装完成后，重启terminal，check version：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 1560;
+flex-basis: 3744px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-34-45-image.png?msec=1687566645915" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-34-45-image.png?msec=1687566645915"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-34-45-image.png" data-size="1451x93">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-34-45-image.png"
+width="1451"
+height="93"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-34-45-image_huc26ca3a09e9584c13f221934bcea3af7_21584_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-10-34-45-image_huc26ca3a09e9584c13f221934bcea3af7_21584_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -58,9 +110,16 @@ WARN 2023/06/23 10:15:21 config: languages.ar.description: custom params on the 
 Re-run Hugo with the flag --panicOnWarning to get a better error message.
 &lt;/code>&lt;/pre>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 662;
+flex-basis: 1588px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-10-47-51-image.png?msec=1687566645925" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-10-47-51-image.png?msec=1687566645925"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-47-51-image.png" data-size="1781x269">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-47-51-image.png"
+width="1781"
+height="269"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-10-47-51-image_hu14c9e16ea822b6b691459f1af247bc70_68502_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-10-47-51-image_hu14c9e16ea822b6b691459f1af247bc70_68502_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -93,9 +152,16 @@ timeout : &amp;quot;10m&amp;quot;
 &lt;/code>&lt;/pre>
 &lt;p>success！&lt;/p>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 239;
+flex-basis: 574px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-11-03-21-image.png?msec=1687566645915" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-11-03-21-image.png?msec=1687566645915"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-11-03-21-image.png" data-size="1125x470">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-11-03-21-image.png"
+width="1125"
+height="470"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-11-03-21-image_huea22ffe750cede3b8d32e8ad895e6135_55767_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-11-03-21-image_huea22ffe750cede3b8d32e8ad895e6135_55767_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -204,17 +270,31 @@ commit_message: ${{ github.event.head_commit.message }}
 &lt;/ol>
 &lt;p>Action下rerun之前的job：&lt;/p>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 237;
+flex-basis: 569px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-14-08-26-image.png?msec=1687566645924" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-14-08-26-image.png?msec=1687566645924"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-26-image.png" data-size="1641x692">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-26-image.png"
+width="1641"
+height="692"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-26-image_hud683c06c55de68e714e914f86f04b84f_67653_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-26-image_hud683c06c55de68e714e914f86f04b84f_67653_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
 &lt;/figure>&lt;/p>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 193;
+flex-basis: 464px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-23-14-08-59-image.png?msec=1687566645923" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-23-14-08-59-image.png?msec=1687566645923"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-59-image.png" data-size="1572x812">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-59-image.png"
+width="1572"
+height="812"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-59-image_hu7aaabdc588123559e2730b11a9278d53_80540_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-23-14-08-59-image_hu7aaabdc588123559e2730b11a9278d53_80540_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -250,8 +330,8 @@ icon: img-name
 &lt;pre>&lt;code class="language-yaml"># Enable global emoji support
 enableEmoji: true
 &lt;/code>&lt;/pre>
-&lt;p>随后直接在文章的md文档中添加emoji id即可显示，查询id：[emoji-cheat-sheet](&lt;a class="link" href="https://www.webfx.com/tools/emoji-cheat-sheet/" target="_blank" rel="noopener"
->🎁 Emoji cheat sheet for GitHub, Basecamp, Slack &amp;amp; more&lt;/a>)&lt;/p>
+&lt;p>随后直接在文章的md文档中添加emoji id即可显示，查询id：&lt;a class="link" href="https://www.webfx.com/tools/emoji-cheat-sheet/" target="_blank" rel="noopener"
+>emoji-cheat-sheet&lt;/a>&lt;/p>
 &lt;h4 id="language">Language&lt;/h4>
 &lt;p>如果只想保持一种语言，则config中的language只保留一种语言，如中文：&lt;/p>
 &lt;pre>&lt;code class="language-yaml">languages:
@@ -283,9 +363,16 @@ theme: github-light
 &lt;/code>&lt;/pre>
 &lt;p>效果：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 259;
+flex-basis: 623px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-26-55.png" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-26-55.png"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-26-55.png" data-size="1314x506">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-26-55.png"
+width="1314"
+height="506"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-26-55_hu32da1bc7dd09b77eca3887d2fd7d3cfe_27125_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-17-26-55_hu32da1bc7dd09b77eca3887d2fd7d3cfe_27125_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -325,9 +412,16 @@ loading="lazy"
 &lt;/code>&lt;/pre>
 &lt;p>效果：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 415;
+flex-basis: 997px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-03-20.png" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-03-20.png"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-20.png" data-size="968x233">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-20.png"
+width="968"
+height="233"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-20_hu6dcf484c9acbe775bc3f2bc3dba60cf5_25474_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-20_hu6dcf484c9acbe775bc3f2bc3dba60cf5_25474_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -362,9 +456,16 @@ loading="lazy"
 &lt;/blockquote>
 &lt;p>效果：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 422;
+flex-basis: 1013px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-17-03-58.png" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-17-03-58.png"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-58.png" data-size="891x211">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-58.png"
+width="891"
+height="211"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-58_hu9e1375bc14d3de3019ff7b4bc2214904_23122_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-17-03-58_hu9e1375bc14d3de3019ff7b4bc2214904_23122_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -375,9 +476,16 @@ loading="lazy"
 &lt;p>首先前往&lt;a class="link" href="https://analytics.google.com/analytics/web/provision/#/provision" target="_blank" rel="noopener"
 >谷歌分析官网&lt;/a>，获取Measurement ID，具体操作跟随网站指引即可，名称随意，最终获得一个G-开头的Measurement ID。
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 197;
+flex-basis: 475px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-15-53-46.png" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-15-53-46.png"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-53-46.png" data-size="2395x1210">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-53-46.png"
+width="2395"
+height="1210"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-53-46_hu2a55c2948fc1286449afff67f0c3137f_157519_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-15-53-46_hu2a55c2948fc1286449afff67f0c3137f_157519_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -389,9 +497,16 @@ loading="lazy"
 >谷歌搜索控制台&lt;/a>。在验证所有权的选项中选择“Google Analytics”。&lt;/p>
 &lt;p>然后点击侧边栏的【站点地图】页面就可以提交我们主页的站点地图URL:
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 380;
+flex-basis: 913px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-15-58-33.png" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-15-58-33.png"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-58-33.png" data-size="2078x546">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-58-33.png"
+width="2078"
+height="546"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-15-58-33_hu3cfc4a6a8a87978dba79c7e608a20ea2_63461_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-15-58-33_hu3cfc4a6a8a87978dba79c7e608a20ea2_63461_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -419,9 +534,16 @@ s.parentNode.insertBefore(hm, s);
 &lt;/ol>
 &lt;p>可能由于博客刚建立，被认为是低质站点，过几天再来看看。。。😭😭😭&lt;/p>
 &lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 302;
+flex-basis: 725px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-31-33-image.png?msec=1687566693147" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-31-33-image.png?msec=1687566693147"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-31-33-image.png" data-size="1294x428">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-31-33-image.png"
+width="1294"
+height="428"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-31-33-image_huce485dccebdd628bbde385bcc3f54506_31964_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-08-31-33-image_huce485dccebdd628bbde385bcc3f54506_31964_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
@@ -446,27 +568,48 @@ loading="lazy"
 &lt;strong>bug 5&lt;/strong>：小改之后，出现底部部分信息不显示问题：&lt;/p>
 &lt;p>原版：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 608;
+flex-basis: 1459px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-50-53-image.png?msec=1687567853625" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-50-53-image.png?msec=1687567853625"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-50-53-image.png" data-size="955x157">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-50-53-image.png"
+width="955"
+height="157"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-50-53-image_hud812f61a21749eb8a1aad87153fe82bd_10272_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-08-50-53-image_hud812f61a21749eb8a1aad87153fe82bd_10272_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
 &lt;/figure>&lt;/p>
 &lt;p>魔改版：
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 474;
+flex-basis: 1139px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-48-39-image.png?msec=1687567719717" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-48-39-image.png?msec=1687567719717"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-48-39-image.png" data-size="1035x218">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-48-39-image.png"
+width="1035"
+height="218"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-48-39-image_hu30be7cdd2bad3bc4befce1574e77525f_22524_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-08-48-39-image_hu30be7cdd2bad3bc4befce1574e77525f_22524_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
 &lt;/figure>&lt;/p>
 &lt;p>&lt;strong>解决&lt;/strong>：直接替换themes/下的stack为之前的最新版本，若文件夹名称修改，需要同步到config.yaml中开头的theme字段
 &lt;figure
+class="gallery-image"
+style="
+flex-grow: 411;
+flex-basis: 987px"
 >
-&lt;a href="https://hyrtee.github.io/images%5c2023-06-24-08-52-37-image.png?msec=1687567957684" >
-&lt;img src="https://hyrtee.github.io/images%5c2023-06-24-08-52-37-image.png?msec=1687567957684"
+&lt;a href="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-52-37-image.png" data-size="885x215">
+&lt;img src="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-52-37-image.png"
+width="885"
+height="215"
+srcset="https://hyrtee.github.io/2023/start-blog/2023-06-24-08-52-37-image_hucc6f12ccc99d7dbc0689aa7e06245635_27762_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/start-blog/2023-06-24-08-52-37-image_hucc6f12ccc99d7dbc0689aa7e06245635_27762_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 >
 &lt;/a>
