@@ -432,8 +432,8 @@ loading="lazy"
 >
 &lt;/a>
 &lt;/figure>&lt;/p>
-&lt;p>## 让谷歌&amp;amp;百度搜到我&lt;/p>
-&lt;p>### 谷歌&lt;/p>
+&lt;h2 id="让谷歌百度搜到我">让谷歌&amp;amp;百度搜到我&lt;/h2>
+&lt;h3 id="谷歌">谷歌&lt;/h3>
 &lt;h4 id="获取谷歌分析id">获取谷歌分析ID&lt;/h4>
 &lt;p>首先前往&lt;a class="link" href="https://analytics.google.com/analytics/web/provision/#/provision" target="_blank" rel="noopener"
 >谷歌分析官网&lt;/a>，获取Measurement ID，具体操作跟随网站指引即可，名称随意，最终获得一个G-开头的Measurement ID。
