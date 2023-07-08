@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>qemu on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/qemu/</link><description>Recent content in qemu on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 24 Jun 2023 18:25:36 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/qemu/index.xml" rel="self" type="application/rss+xml"/><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
 &lt;p>kernel开启相关配置项：&lt;/p>
-&lt;pre>&lt;code class="language-bash">CONFIG_9P_FS=y
-CONFIG_9P_FS_POSIX_ACL=y
-CONFIG_9P_FS_SECURITY=y
-CONFIG_NETWORK_FILESYSTEMS=y
-CONFIG_NET_9P=y
-CONFIG_NET_9P_DEBUG=y
-CONFIG_NET_9P_VIRTIO=y
-CONFIG_PCI=y
-CONFIG_PCI_HOST_COMMON=y
-CONFIG_PCI_HOST_GENERIC=y
-CONFIG_VIRTIO_PCI=y
-CONFIG_VIRTIO_BLK=y
-CONFIG_VIRTIO_NET=y
-CONFIG_VIRTIO_MMIO=y
-CONFIG_FUSE_FS=y
-CONFIG_VIRTIO_FS=y
-CONFIG_VIRTIO_INPUT=y
-&lt;/code>&lt;/pre>
-&lt;p>宿主机支持相关库&lt;/p>
-&lt;pre>&lt;code class="language-bash">sudo apt install -y libcap-dev
-sudo apt install -y libattr
-sudo apt install -y libattr-dev
-&lt;/code>&lt;/pre>
-&lt;p>qemu编译支持virtfs&lt;/p>
-&lt;pre>&lt;code class="language-bash">./configure --target-list=aarch64-softmmu --enable-kvm --enable-virtfs --enable-slirp --enable-debug
-&lt;/code>&lt;/pre>
-&lt;h2 id="执行步骤">执行步骤&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS_POSIX_ACL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS_SECURITY&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_NETWORK_FILESYSTEMS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_NET_9P&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_NET_9P_DEBUG&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_NET_9P_VIRTIO&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_PCI&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_PCI_HOST_COMMON&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_PCI_HOST_GENERIC&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_PCI&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_BLK&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_NET&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_MMIO&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_FUSE_FS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_FS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_VIRTIO_INPUT&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>宿主机支持相关库&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt install -y libcap-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install -y libattr
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install -y libattr-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>qemu编译支持virtfs&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>./configure --target-list&lt;span style="color:#56b6c2">=&lt;/span>aarch64-softmmu --enable-kvm --enable-virtfs --enable-slirp --enable-debug
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="执行步骤">执行步骤&lt;/h2>
 &lt;p>path/to/share：设置成自己在宿主机的要共享的目录&lt;/p>
-&lt;pre>&lt;code class="language-bash">qemu-system-aarch64 \
--M virt,secure=on -m 4G -nographic \
--machine firmware=bl31.bin \
--fsdev local,id=shareid,path=/path/to/share,security_model=none \
--device virtio-9p-device,fsdev=shareid,mount_tag=share \
--device loader,addr=0x1002000000,file=tee.elf \
---kernel Image \
---initrd rootfs.cpio.gz
-&lt;/code>&lt;/pre></description></item></channel></rss>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>qemu-system-aarch64 &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> -M virt,secure&lt;span style="color:#56b6c2">=&lt;/span>on -m 4G -nographic &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> -machine &lt;span style="color:#e06c75">firmware&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>bl31.bin &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> -fsdev local,id&lt;span style="color:#56b6c2">=&lt;/span>shareid,path&lt;span style="color:#56b6c2">=&lt;/span>/path/to/share,security_model&lt;span style="color:#56b6c2">=&lt;/span>none &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> -device virtio-9p-device,fsdev&lt;span style="color:#56b6c2">=&lt;/span>shareid,mount_tag&lt;span style="color:#56b6c2">=&lt;/span>share &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> -device loader,addr&lt;span style="color:#56b6c2">=&lt;/span>0x1002000000,file&lt;span style="color:#56b6c2">=&lt;/span>tee.elf &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> --kernel Image &lt;span style="color:#98c379">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#98c379">&lt;/span> --initrd rootfs.cpio.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
