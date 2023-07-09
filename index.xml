@@ -229,7 +229,19 @@ srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-48-17_hue32c6
 loading="lazy"
 >
 &lt;/a>
-&lt;/figure>&lt;/p></description></item><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
+&lt;/figure>&lt;/p>
+&lt;h2 id="vercel-国内无法访问">vercel 国内无法访问&lt;/h2>
+&lt;p>试了一下，果然不能访问了，原因是vercel.app 被 DNS 污染（即被墙），目前在国内已经无法打开，官方那个针对有自定义域名的，给出了解决方案：&lt;/p>
+&lt;p>A记录修改为：
+&lt;code>76.223.126.88&lt;/code>
+cname记录修改为：
+&lt;code>cname-china.vercel-dns.com &lt;/code>&lt;/p>
+&lt;p>奈何作者财力不够，还是老老实实用白嫖github吧，其实访问速度也还行.jpg🫥&lt;/p>
+&lt;h2 id="refs">Refs&lt;/h2>
+&lt;p>&lt;a class="link" href="https://www.techxiaofei.com/post/hugo/hugo_vercel/" target="_blank" rel="noopener"
+>https://www.techxiaofei.com/post/hugo/hugo_vercel/&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://segmentfault.com/a/1190000040063325" target="_blank" rel="noopener"
+>https://segmentfault.com/a/1190000040063325&lt;/a>&lt;/p></description></item><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
 &lt;p>kernel开启相关配置项：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS_POSIX_ACL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
