@@ -1,4 +1,235 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hyrtee's Blog</title><link>https://hyrtee.github.io/</link><description>Recent content on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 24 Jun 2023 18:25:36 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hyrtee's Blog</title><link>https://hyrtee.github.io/</link><description>Recent content on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 09 Jul 2023 08:31:37 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Github + Vercel静态部署博客</title><link>https://hyrtee.github.io/2023/move-to-vercel/</link><pubDate>Sun, 09 Jul 2023 08:31:37 +0800</pubDate><guid>https://hyrtee.github.io/2023/move-to-vercel/</guid><description>&lt;h2 id="注册vercel账户">注册vercel账户&lt;/h2>
+&lt;p>登录&lt;a class="link" href="https://vercel.com/" target="_blank" rel="noopener"
+>vercel&lt;/a>，选择github账号作为Git provider。如果之前部署在gitlab，也可以使用gitlab。&lt;/p>
+&lt;blockquote>
+&lt;p>Create Your Vercel Account → Hobby → input your name → Let&amp;rsquo;s connect your Git provider&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 218;
+flex-basis: 525px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-47-43.png" data-size="1596x729">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-47-43.png"
+width="1596"
+height="729"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-47-43_hu4d34752e5b1c904349a477fe4357cc3d_32858_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-47-43_hu4d34752e5b1c904349a477fe4357cc3d_32858_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>查了下，需要使用gmail、outlook等国外邮箱，好像163和qq都会blocked，毕竟vercel是国外网站？&lt;/p>
+&lt;p>github → Settings → Emails，替换成gmail，verify一下：&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 629;
+flex-basis: 1511px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-58-32.png" data-size="1058x168">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-58-32.png"
+width="1058"
+height="168"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-58-32_hu5e06c1425d78dac5a7fbb454139d6f6e_7500_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-08-58-32_hu5e06c1425d78dac5a7fbb454139d6f6e_7500_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>what？&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 531;
+flex-basis: 1274px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-00-40.png" data-size="834x157">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-00-40.png"
+width="834"
+height="157"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-00-40_hua44d929dce334c264feced57c620d1f2_8676_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-00-40_hua44d929dce334c264feced57c620d1f2_8676_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>后面等待了一会儿，点击验证邮件中的链接，而不是按钮，verify success，真玄学&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 601;
+flex-basis: 1444px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-21-58.png" data-size="981x163">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-21-58.png"
+width="981"
+height="163"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-21-58_hu1935d023af0d18b0980fa4b0df74ed08_6757_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-21-58_hu1935d023af0d18b0980fa4b0df74ed08_6757_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 952;
+flex-basis: 2286px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-23-07.png" data-size="1448x152">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-23-07.png"
+width="1448"
+height="152"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-23-07_hu230a937d25d9abe82a79ab9d5d36aca9_16686_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-23-07_hu230a937d25d9abe82a79ab9d5d36aca9_16686_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>随后选择 → Continue with email&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 253;
+flex-basis: 607px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-33-43.png" data-size="1638x647">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-33-43.png"
+width="1638"
+height="647"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-33-43_hu2f8bdc702a7f1696c735124475805ba1_44841_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-33-43_hu2f8bdc702a7f1696c735124475805ba1_44841_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>success&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 287;
+flex-basis: 688px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-36-29.png" data-size="910x317">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-36-29.png"
+width="910"
+height="317"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-36-29_hu3cefc5a9708587bcd7c310463106fdd8_26500_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-01-09-36-29_hu3cefc5a9708587bcd7c310463106fdd8_26500_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>理论上说，之前的log in with email页面会立刻刷新并log in，但是无反应，且使用验证过的gmail登录时，报错&lt;code>We are unable to complete your signup. Please read this guide for further details&lt;/code>，而用该gmail重新sign up时，又报&lt;code>The email address already exists. Log in?&lt;/code>。无解，只能联系客服：registration@vercel.com。&lt;/p>
+&lt;p>约两天后，官方回信，已解除限制：&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 280;
+flex-basis: 672px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-34-08.png" data-size="2130x760">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-34-08.png"
+width="2130"
+height="760"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-34-08_hue0ae8bd3e7805e8075dc8a8edabbb372_87573_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-34-08_hue0ae8bd3e7805e8075dc8a8edabbb372_87573_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>终于成功登录：&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 208;
+flex-basis: 501px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-36-07.png" data-size="1638x784">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-36-07.png"
+width="1638"
+height="784"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-36-07_hu52238da7518eba6dad602e90a517eda1_106118_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-36-07_hu52238da7518eba6dad602e90a517eda1_106118_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="导入github仓库">导入Github仓库&lt;/h2>
+&lt;p>选择首页的Create a New Project，又出现了熟悉的界面，此时就可以选择Continue with Github，毫无阻碍。&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 182;
+flex-basis: 437px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-43-38.png" data-size="1577x866">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-43-38.png"
+width="1577"
+height="866"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-43-38_hu0ae4bc25b51452177c0e72ce2d9f3b28_139299_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-08-43-38_hu0ae4bc25b51452177c0e72ce2d9f3b28_139299_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>如果github上没有安装vercel应用，则需要安装下：可授权所有仓库或部署的仓库&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 330;
+flex-basis: 793px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-27-55.png" data-size="946x286">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-27-55.png"
+width="946"
+height="286"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-27-55_hu48c7490d8c9296949ed040a7e03c281b_23721_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-27-55_hu48c7490d8c9296949ed040a7e03c281b_23721_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="一键部署">一键部署&lt;/h2>
+&lt;p>激动人心的时刻到了😃，导入username.github.io仓库之后，开始deploy。由于该仓库是Blog源码仓库的public目录，所以无需选择Framework Preset，默认Other，点击Deploy即可：&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 177;
+flex-basis: 425px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-35-00.png" data-size="1606x906">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-35-00.png"
+width="1606"
+height="906"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-35-00_hu84d0ff1acda4cfe44ca4e6f8a5a9bb6f_76650_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-35-00_hu84d0ff1acda4cfe44ca4e6f8a5a9bb6f_76650_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>出现礼花的时候，还是有点开心的🥳&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 216;
+flex-basis: 518px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-45-25.png" data-size="1615x747">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-45-25.png"
+width="1615"
+height="747"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-45-25_hu480a8151ba9255f5f25db3e2d678bf0f_195528_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-45-25_hu480a8151ba9255f5f25db3e2d678bf0f_195528_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>访问https://hyrtee-github-io.vercel.app/&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 313;
+flex-basis: 751px"
+>
+&lt;a href="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-48-17.png" data-size="2237x714">
+&lt;img src="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-48-17.png"
+width="2237"
+height="714"
+srcset="https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-48-17_hue32c66085ca60d765f153d4dd67f69d8_138749_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/move-to-vercel/2023-07-09-09-48-17_hue32c66085ca60d765f153d4dd67f69d8_138749_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p></description></item><item><title>qemu使用9pfs共享宿主机文件</title><link>https://hyrtee.github.io/2023/qemu-9pfs/</link><pubDate>Sat, 24 Jun 2023 18:25:36 +0800</pubDate><guid>https://hyrtee.github.io/2023/qemu-9pfs/</guid><description>&lt;h2 id="预置条件">预置条件&lt;/h2>
 &lt;p>kernel开启相关配置项：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">CONFIG_9P_FS_POSIX_ACL&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>y
