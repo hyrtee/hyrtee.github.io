@@ -1,4 +1,115 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 16 Jul 2023 09:06:51 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows11 安装 WSL2</title><link>https://hyrtee.github.io/2023/install-wsl2-on-win11/</link><pubDate>Sun, 16 Jul 2023 09:06:51 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-wsl2-on-win11/</guid><description>&lt;p>以前在windows上都是通过VMware开Linux，不仅需要破解，还慢。既然有了WSL2这种好东西，不得用起来😏。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 16 Jul 2023 16:33:59 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>搭建 aarch64 工作环境</title><link>https://hyrtee.github.io/2023/install-cross-compile-tools/</link><pubDate>Sun, 16 Jul 2023 16:33:59 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-cross-compile-tools/</guid><description>&lt;p>继之前在win11安装好wsl2之后，开始搭建aarch64工作环境，方便进行aarch64版本的Linux和ATF等代码调试。&lt;/p>
+&lt;h2 id="preutils-tools">Preutils tools&lt;/h2>
+&lt;h3 id="gcc">Gcc&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e5c07b">apt-get&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">gcc&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="gcc-aarch64-linux-gnu">Gcc-aarch64-linux-gnu&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e5c07b">apt-get&lt;/span> &lt;span style="color:#e06c75">update&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e5c07b">apt-get&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e5c07b">gcc-aarch64&lt;/span>&lt;span style="color:#e06c75">-linux-gnu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 1117;
+flex-basis: 2681px"
+>
+&lt;a href="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-41-40.png" data-size="2302x206">
+&lt;img src="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-41-40.png"
+width="2302"
+height="206"
+srcset="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-41-40_huf2ae9f92b553a94186ef36db23192212_524988_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-41-40_huf2ae9f92b553a94186ef36db23192212_524988_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h3 id="dependency-packages">Dependency packages&lt;/h3>
+&lt;p>To install the essential packages followed, create a .sh bash file, write these apt commands to the file. Then, just run the bash. for example:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>touch dependency-install.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>chmod a+x dependency-install.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>./dependency-install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-get install -y android-tools-adb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y android-tools-fastboot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y autoconf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y automake
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y bc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y bison
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y build-essential
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y cscope
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y curl
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y device-tree-compiler
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y expect
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y flex
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y ftp-upload
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y gdisk
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y iasl
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libattr1-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libc6:i386
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libcap-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libcap-ng-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libfdt-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libftdi-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libglib2.0-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libhidapi-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libncurses5-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libpixman-1-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libssl-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libstdc++6:i386
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libtool
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y libz1:i386
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y make
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y mtools
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y netcat
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y ninja-build
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y python-crypto
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y python-serial
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y python-wand
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y unzip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y uuid-dev
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y xdg-utils
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y xterm
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y xz-utils
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install -y zlib1g-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="special-dependency">special dependency&lt;/h4>
+&lt;p>For some special packages, it can&amp;rsquo;t be installed by apt. instead, manually.&lt;/p>
+&lt;h5 id="slirp">slirp&lt;/h5>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># not forget to set gitlab ssh key&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://gitlab.freedesktop.org/slirp/libslirp.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd&lt;/span> libslirp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt-get install meson
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>meson build
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo ninja -C build install
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># check it&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ldconfig -p |grep slirp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="gdb">gdb&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt install gdb-multiarch
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="qemu">qemu&lt;/h2>
+&lt;p>get source code. Here, I got version 7.2.0&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">wget &lt;/span>&lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">download&lt;/span>.&lt;span style="color:#e06c75">qemu&lt;/span>.&lt;span style="color:#e06c75">org&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>-&lt;span style="color:#d19a66">7.2&lt;/span>.&lt;span style="color:#e06c75">0&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">xz&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">tar&lt;/span> &lt;span style="color:#e06c75">-xvJf&lt;/span> &lt;span style="color:#e06c75">qemu&lt;/span>-&lt;span style="color:#d19a66">7.2&lt;/span>.&lt;span style="color:#e06c75">0&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">xz&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 378;
+flex-basis: 908px"
+>
+&lt;a href="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-47-09.png" data-size="1279x338">
+&lt;img src="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-47-09.png"
+width="1279"
+height="338"
+srcset="https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-47-09_hu8dfd2423a5902b83da875b83b1317e72_567003_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-cross-compile-tools/2023-07-16-16-47-09_hu8dfd2423a5902b83da875b83b1317e72_567003_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>configure&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>./&lt;span style="color:#e06c75">configure&lt;/span> -&lt;span style="color:#e06c75">-target-list&lt;/span>=&lt;span style="color:#e5c07b">aarch64-softmmu&lt;/span> -&lt;span style="color:#e06c75">-enable-fdt&lt;/span> -&lt;span style="color:#e06c75">-disable-kvm&lt;/span> -&lt;span style="color:#e06c75">-disable-xen&lt;/span> -&lt;span style="color:#e06c75">-enable-virtfs&lt;/span> -&lt;span style="color:#e06c75">-enable-slirp&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>build&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>make -j64
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
+&lt;h3 id="exchange-apt-source">exchange apt source&lt;/h3>
+&lt;p>The following signatures couldn&amp;rsquo;t be verified because the public key is not available: NO_PUBKEY 3B4FE6ACC0B21F32&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="refs">refs&lt;/h2>
+&lt;p>&lt;a class="link" href="https://www.qemu.org/download/" target="_blank" rel="noopener"
+>https://www.qemu.org/download/&lt;/a>&lt;/p></description></item><item><title>Windows11 安装 WSL2</title><link>https://hyrtee.github.io/2023/install-wsl2-on-win11/</link><pubDate>Sun, 16 Jul 2023 09:06:51 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-wsl2-on-win11/</guid><description>&lt;p>以前在windows上都是通过VMware开Linux，不仅需要破解，还慢。既然有了WSL2这种好东西，不得用起来😏。&lt;/p>
 &lt;p>之前在公司是装的WSL，结果好多功能用不了。。大意了，WSL2改进的不是一点点啊&lt;/p>
 &lt;p>PS：虽然windows安装WSL2的博客无数，但最好还是学着从&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener"
 >official website&lt;/a>上一步步进行，博客类的仅供参考~&lt;/p>
