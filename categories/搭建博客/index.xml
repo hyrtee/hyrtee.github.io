@@ -811,6 +811,9 @@ loading="lazy"
 >
 &lt;/a>
 &lt;/figure>&lt;/p>
+&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
+&lt;h3 id="运行hugo-server--w时-统计异常">运行hugo server -w时, 统计异常&lt;/h3>
+&lt;p>测试时，显示几百万的访问量无碍，正式部署到github pages后，就显示正常了。&lt;/p>
 &lt;h2 id="refs">refs&lt;/h2>
 &lt;p>&lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
 >https://stack.jimmycai.com/&lt;/a>&lt;/p>
