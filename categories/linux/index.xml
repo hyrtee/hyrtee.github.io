@@ -1,4 +1,132 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/linux/</link><description>Recent content in Linux on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 16 Jul 2023 09:06:51 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows11 安装 WSL2</title><link>https://hyrtee.github.io/2023/install-wsl2-on-win11/</link><pubDate>Sun, 16 Jul 2023 09:06:51 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-wsl2-on-win11/</guid><description>&lt;p>以前在windows上都是通过VMware开Linux，不仅需要破解，还慢。既然有了WSL2这种好东西，不得用起来😏。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/linux/</link><description>Recent content in Linux on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 08:47:57 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试aarch64 linux内核</title><link>https://hyrtee.github.io/2023/debug-on-qemu/</link><pubDate>Sat, 22 Jul 2023 08:47:57 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-on-qemu/</guid><description>&lt;p>在之前搭建好aarch64工作环境的基础上，可以进行一系列开发调试工作，本文记录在qemu上使用gdb调试aarch64架构的linux内核代码&lt;/p>
+&lt;h2 id="调试环境">调试环境&lt;/h2>
+&lt;ul>
+&lt;li>rootfs： 基于BusyBox 1.34.1，自制&lt;/li>
+&lt;li>linux： 6.0.12&lt;/li>
+&lt;li>qemu： 7.2.0&lt;/li>
+&lt;li>gdb： 12.1&lt;/li>
+&lt;li>运行环境：win11下的wsl2&lt;/li>
+&lt;/ul>
+&lt;h2 id="linux-编译">linux 编译&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">wget &lt;/span>&lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">mirrors&lt;/span>.&lt;span style="color:#e06c75">edge&lt;/span>.&lt;span style="color:#e06c75">kernel&lt;/span>.&lt;span style="color:#e06c75">org&lt;/span>/&lt;span style="color:#e06c75">pub&lt;/span>/&lt;span style="color:#e06c75">linux&lt;/span>/&lt;span style="color:#e06c75">kernel&lt;/span>/&lt;span style="color:#e06c75">v6&lt;/span>.&lt;span style="color:#e06c75">x&lt;/span>/&lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#e06c75">12&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">gz&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">tar&lt;/span> &lt;span style="color:#e06c75">-xvf&lt;/span> &lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#e06c75">12&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">gz&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd &lt;/span>&lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#e06c75">12&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">ARCH&lt;/span>=&lt;span style="color:#e06c75">arm64&lt;/span> &lt;span style="color:#e06c75">defconfig&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>关闭地址随机化&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">ARCH&lt;/span>=&lt;span style="color:#e06c75">arm64&lt;/span> &lt;span style="color:#e06c75">menuconfig&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Kernel&lt;/span> &lt;span style="color:#e06c75">Features&lt;/span> ---&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> [ ] &lt;span style="color:#e06c75">Randomize&lt;/span> &lt;span style="color:#e06c75">the&lt;/span> &lt;span style="color:#e06c75">address&lt;/span> &lt;span style="color:#e06c75">of&lt;/span> &lt;span style="color:#e06c75">the&lt;/span> &lt;span style="color:#e06c75">kernel&lt;/span> &lt;span style="color:#e06c75">image&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>编译&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">-j64&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="自制rootfs根文件系统">自制rootfs根文件系统&lt;/h2>
+&lt;p>编译 busybox&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 下载&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">wget &lt;/span>&lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">busybox&lt;/span>.&lt;span style="color:#e06c75">net&lt;/span>/&lt;span style="color:#e06c75">downloads&lt;/span>/&lt;span style="color:#e06c75">busybox&lt;/span>-&lt;span style="color:#d19a66">1.34&lt;/span>.&lt;span style="color:#e06c75">1&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">bz2&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">tar&lt;/span> &lt;span style="color:#e06c75">xvf&lt;/span> &lt;span style="color:#e06c75">busybox&lt;/span>-&lt;span style="color:#d19a66">1.34&lt;/span>.&lt;span style="color:#e06c75">1&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>.&lt;span style="color:#e06c75">bz2&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd &lt;/span>&lt;span style="color:#e06c75">busybox&lt;/span>-&lt;span style="color:#d19a66">1.34&lt;/span>.&lt;span style="color:#e06c75">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># aarch64 config&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">ARCH&lt;/span>=&lt;span style="color:#e06c75">arm64&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">defconfig&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 设置为静态链接&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">ARCH&lt;/span>=&lt;span style="color:#e06c75">arm64&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">menuconfig&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">Settings&lt;/span> ---&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> [*] &lt;span style="color:#e06c75">Build&lt;/span> &lt;span style="color:#e06c75">static&lt;/span> &lt;span style="color:#e06c75">binary&lt;/span> (&lt;span style="color:#e06c75">no&lt;/span> &lt;span style="color:#e06c75">shared&lt;/span> &lt;span style="color:#e06c75">libs&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 编译&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">ARCH&lt;/span>=&lt;span style="color:#e06c75">arm64&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">-j64&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>制作rootfs&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建一个大小为64M，格式为ext4的rootfs镜像&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">dd&lt;/span> &lt;span style="color:#c678dd">if&lt;/span>=/&lt;span style="color:#e06c75">dev&lt;/span>/&lt;span style="color:#e06c75">zero&lt;/span> &lt;span style="color:#e06c75">of&lt;/span>=&lt;span style="color:#e06c75">rootfs&lt;/span>.&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">bs&lt;/span>=&lt;span style="color:#d19a66">1M&lt;/span> &lt;span style="color:#e06c75">count&lt;/span>=&lt;span style="color:#d19a66">64&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">mkfs&lt;/span>.&lt;span style="color:#e06c75">ext4&lt;/span> &lt;span style="color:#e06c75">rootfs&lt;/span>.&lt;span style="color:#e06c75">img&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 将rootfs镜像挂载到rootfs目录（挂载点），方便操作镜像内容&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">rootfs&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e5c07b">mount &lt;/span>&lt;span style="color:#e06c75">-t&lt;/span> &lt;span style="color:#e06c75">ext4&lt;/span> &lt;span style="color:#e06c75">-o&lt;/span> &lt;span style="color:#e06c75">loop&lt;/span> &lt;span style="color:#e06c75">rootfs&lt;/span>.&lt;span style="color:#e06c75">img&lt;/span> ./&lt;span style="color:#e06c75">rootfs&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 将编译好的busybox安装到rootfs中，其实大部分也是复制操作，只是make install会根据根目录下的Makefile中的install目标，来执行指定操作。&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">install&lt;/span> &lt;span style="color:#e06c75">CONFIG_PREFIX&lt;/span>=./&lt;span style="color:#e06c75">rootfs&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd &lt;/span>&lt;span style="color:#e06c75">rootfs&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 创建必要的系统目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e06c75">mkdir&lt;/span> &lt;span style="color:#e06c75">proc&lt;/span> &lt;span style="color:#e06c75">dev&lt;/span> &lt;span style="color:#e06c75">etc&lt;/span> &lt;span style="color:#e06c75">home&lt;/span> &lt;span style="color:#e06c75">mnt&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 复制必要的自启动脚本&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e5c07b">cp &lt;/span>&lt;span style="color:#e06c75">-r&lt;/span> ../&lt;span style="color:#e06c75">examples&lt;/span>/&lt;span style="color:#e06c75">bootfloppy&lt;/span>/&lt;span style="color:#e06c75">etc&lt;/span>/* &lt;span style="color:#e06c75">etc&lt;/span>/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e"># 解挂载&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd &lt;/span>..
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sudo&lt;/span> &lt;span style="color:#e06c75">umount&lt;/span> &lt;span style="color:#e06c75">rootfs&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="run">run&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>/&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>-&lt;span style="color:#d19a66">7.2&lt;/span>.&lt;span style="color:#d19a66">0&lt;/span>/&lt;span style="color:#e06c75">build&lt;/span>/&lt;span style="color:#e5c07b">qemu-system&lt;/span>&lt;span style="color:#e06c75">-aarch64&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">-machine&lt;/span> &lt;span style="color:#e06c75">virt&lt;/span> &lt;span style="color:#e06c75">-cpu&lt;/span> &lt;span style="color:#e5c07b">cortex-a57&lt;/span> &lt;span style="color:#e06c75">-machine&lt;/span> &lt;span style="color:#e06c75">type&lt;/span>=&lt;span style="color:#e06c75">virt&lt;/span> &lt;span style="color:#e06c75">-nographic&lt;/span> &lt;span style="color:#e06c75">-smp&lt;/span> &lt;span style="color:#d19a66">4&lt;/span> &lt;span style="color:#e06c75">-m&lt;/span> &lt;span style="color:#d19a66">2048&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-kernel&lt;/span> /&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#d19a66">12&lt;/span>/&lt;span style="color:#e06c75">arch&lt;/span>/&lt;span style="color:#e06c75">arm64&lt;/span>/&lt;span style="color:#e06c75">boot&lt;/span>/&lt;span style="color:#e06c75">Image&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-initrd&lt;/span> /&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">busybox&lt;/span>-&lt;span style="color:#d19a66">1.34&lt;/span>.&lt;span style="color:#d19a66">1&lt;/span>/&lt;span style="color:#e06c75">rootfs&lt;/span>.&lt;span style="color:#e06c75">img&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-append&lt;/span> &lt;span style="color:#98c379">&amp;#39;root=/dev/ram init=/linuxrc console=ttyAMA0 nokaslr&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 389;
+flex-basis: 934px"
+>
+&lt;a href="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-10-43.png" data-size="1020x262">
+&lt;img src="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-10-43.png"
+width="1020"
+height="262"
+srcset="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-10-43_hucc5aa03cfd225e89f6b458b9bc575fe3_310812_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-10-43_hucc5aa03cfd225e89f6b458b9bc575fe3_310812_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="debug">debug&lt;/h2>
+&lt;p>add &lt;code>-s -S&lt;/code> at qemu boot, run qemu.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>/&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>-&lt;span style="color:#d19a66">7.2&lt;/span>.&lt;span style="color:#d19a66">0&lt;/span>/&lt;span style="color:#e06c75">build&lt;/span>/&lt;span style="color:#e5c07b">qemu-system&lt;/span>&lt;span style="color:#e06c75">-aarch64&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">-machine&lt;/span> &lt;span style="color:#e06c75">virt&lt;/span> &lt;span style="color:#e06c75">-cpu&lt;/span> &lt;span style="color:#e5c07b">cortex-a57&lt;/span> &lt;span style="color:#e06c75">-machine&lt;/span> &lt;span style="color:#e06c75">type&lt;/span>=&lt;span style="color:#e06c75">virt&lt;/span> &lt;span style="color:#e06c75">-nographic&lt;/span> &lt;span style="color:#e06c75">-smp&lt;/span> &lt;span style="color:#d19a66">4&lt;/span> &lt;span style="color:#e06c75">-m&lt;/span> &lt;span style="color:#d19a66">2048&lt;/span> &lt;span style="color:#e06c75">-s&lt;/span> &lt;span style="color:#e06c75">-S&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-kernel&lt;/span> /&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#d19a66">12&lt;/span>/&lt;span style="color:#e06c75">arch&lt;/span>/&lt;span style="color:#e06c75">arm64&lt;/span>/&lt;span style="color:#e06c75">boot&lt;/span>/&lt;span style="color:#e06c75">Image&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-initrd&lt;/span> /&lt;span style="color:#e06c75">home&lt;/span>/&lt;span style="color:#e06c75">hyrtee&lt;/span>/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">busybox&lt;/span>-&lt;span style="color:#d19a66">1.34&lt;/span>.&lt;span style="color:#d19a66">1&lt;/span>/&lt;span style="color:#e06c75">rootfs&lt;/span>.&lt;span style="color:#e06c75">img&lt;/span> \
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> -&lt;span style="color:#e06c75">-append&lt;/span> &lt;span style="color:#98c379">&amp;#39;root=/dev/ram init=/linuxrc console=ttyAMA0 nokaslr&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>open a new terminal, input:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">gdb-multiarch&lt;/span> -&lt;span style="color:#e06c75">-ex&lt;/span> &lt;span style="color:#98c379">&amp;#34;target remote:1234&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(&lt;span style="color:#e06c75">gdb&lt;/span>) &lt;span style="color:#e5c07b">add-symbol&lt;/span>&lt;span style="color:#56b6c2">-file&lt;/span> ~/&lt;span style="color:#e06c75">qemu&lt;/span>/&lt;span style="color:#e06c75">linux&lt;/span>-&lt;span style="color:#d19a66">6.0&lt;/span>.&lt;span style="color:#d19a66">12&lt;/span>/&lt;span style="color:#e06c75">vmlinux&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(&lt;span style="color:#e06c75">gdb&lt;/span>) &lt;span style="color:#e06c75">b&lt;/span> &lt;span style="color:#e06c75">start_kernel&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(&lt;span style="color:#e06c75">gdb&lt;/span>) &lt;span style="color:#e06c75">c&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 387;
+flex-basis: 930px"
+>
+&lt;a href="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-44-44.png" data-size="1179x304">
+&lt;img src="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-44-44.png"
+width="1179"
+height="304"
+srcset="https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-44-44_hu9561814c91037b44314364c40d3d4709_430902_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/debug-on-qemu/2023-07-22-17-44-44_hu9561814c91037b44314364c40d3d4709_430902_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
+&lt;h3 id="vfs-unable-to-mount-root-fs-on-unknown-block10">VFS: Unable to mount root fs on unknown-block(1,0)&lt;/h3>
+&lt;p>you may need reconfig kernel, run &lt;code>make menuconfig&lt;/code> at kernel root dir, then set the following config:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>-&amp;gt; &lt;span style="color:#e06c75">Device&lt;/span> &lt;span style="color:#e06c75">Drivers&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> │ -&amp;gt; &lt;span style="color:#e06c75">Block&lt;/span> &lt;span style="color:#e06c75">devices&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;*&amp;gt; &lt;span style="color:#e06c75">RAM&lt;/span> &lt;span style="color:#e06c75">block&lt;/span> &lt;span style="color:#e06c75">device&lt;/span> &lt;span style="color:#e06c75">support&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> │ │ (&lt;span style="color:#d19a66">16&lt;/span>) &lt;span style="color:#c678dd">Default&lt;/span> &lt;span style="color:#e06c75">number&lt;/span> &lt;span style="color:#e06c75">of&lt;/span> &lt;span style="color:#e06c75">RAM&lt;/span> &lt;span style="color:#e06c75">disks&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> │ │ (&lt;span style="color:#d19a66">131072&lt;/span>) &lt;span style="color:#c678dd">Default&lt;/span> &lt;span style="color:#e06c75">RAM&lt;/span> &lt;span style="color:#e06c75">disk&lt;/span> &lt;span style="color:#e06c75">size&lt;/span> (&lt;span style="color:#e06c75">kbytes&lt;/span>)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>then set &lt;code>root=/dev/ram&lt;/code> at kernnl command line&lt;/p>
+&lt;h3 id="requested-init-init-failed-error--8">Requested init /init failed (error -8)&lt;/h3>
+&lt;p>busybox should be built to Arm64 platform, instead x86-64 default. So rebuild and re-compile it.&lt;/p>
+&lt;h2 id="refs">refs&lt;/h2>
+&lt;p>&lt;a class="link" href="https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788" target="_blank" rel="noopener"
+>https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://ibug.io/blog/2019/04/os-lab-1/" target="_blank" rel="noopener"
+>https://ibug.io/blog/2019/04/os-lab-1/&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs" target="_blank" rel="noopener"
+>http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs" target="_blank" rel="noopener"
+>http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs&lt;/a>&lt;/p></description></item><item><title>Windows11 安装 WSL2</title><link>https://hyrtee.github.io/2023/install-wsl2-on-win11/</link><pubDate>Sun, 16 Jul 2023 09:06:51 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-wsl2-on-win11/</guid><description>&lt;p>以前在windows上都是通过VMware开Linux，不仅需要破解，还慢。既然有了WSL2这种好东西，不得用起来😏。&lt;/p>
 &lt;p>之前在公司是装的WSL，结果好多功能用不了。。大意了，WSL2改进的不是一点点啊&lt;/p>
 &lt;p>PS：虽然windows安装WSL2的博客无数，但最好还是学着从&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener"
 >official website&lt;/a>上一步步进行，博客类的仅供参考~&lt;/p>
