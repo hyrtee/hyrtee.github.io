@@ -117,7 +117,7 @@ loading="lazy"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> │ │ (&lt;span style="color:#d19a66">131072&lt;/span>) &lt;span style="color:#c678dd">Default&lt;/span> &lt;span style="color:#e06c75">RAM&lt;/span> &lt;span style="color:#e06c75">disk&lt;/span> &lt;span style="color:#e06c75">size&lt;/span> (&lt;span style="color:#e06c75">kbytes&lt;/span>)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>then set &lt;code>root=/dev/ram&lt;/code> at kernel command line.&lt;/p>
 &lt;h3 id="requested-init-init-failed-error--8">Requested init /init failed (error -8)&lt;/h3>
-&lt;p>busybox should be built to Arm64 platform, instead x86-64 default. So rebuild and re-compile it.&lt;/p>
+&lt;p>busybox should be built to Arm64 platform, instead of x86-64 default. So rebuild and re-compile it.&lt;/p>
 &lt;h2 id="refs">refs&lt;/h2>
 &lt;p>&lt;a class="link" href="https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788" target="_blank" rel="noopener"
 >https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788&lt;/a>&lt;/p>

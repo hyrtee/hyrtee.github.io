@@ -1,4 +1,57 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>qemu on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/qemu/</link><description>Recent content in qemu on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 08:47:57 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/qemu/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试aarch64 linux内核</title><link>https://hyrtee.github.io/2023/debug-on-qemu/</link><pubDate>Sat, 22 Jul 2023 08:47:57 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-on-qemu/</guid><description>&lt;p>在之前搭建好aarch64工作环境的基础上，可以进行一系列开发调试工作，本文记录在qemu上使用gdb调试aarch64架构的linux内核代码。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>qemu on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/qemu/</link><description>Recent content in qemu on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 19:43:30 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/qemu/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试ATF</title><link>https://hyrtee.github.io/2023/debug-atf-on-qemu/</link><pubDate>Sat, 22 Jul 2023 19:43:30 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-atf-on-qemu/</guid><description>&lt;p>没工作之前，连ATF是啥都不知道😑&lt;/p>
+&lt;h2 id="atf-简介">ATF 简介&lt;/h2>
+&lt;p>Arm Trusted Firmware，Arm可信固件，定义了secure world software中的一系列底层接口的参考实现。&lt;/p>
+&lt;h2 id="atf-上手">ATF 上手&lt;/h2>
+&lt;p>学习ATF之前，建议Documentation+code搭配食用。&lt;/p>
+&lt;p>Documentation&lt;/p>
+&lt;ol>
+&lt;li>入门：第一次认识ATF，初步了解它是做什么的&lt;/li>
+&lt;li>进阶
+&lt;ul>
+&lt;li>阅读代码过程中，想知道一些全局变量的含义用法，如PROGRAMMABLE_RESET_ADDRESS&lt;/li>
+&lt;li>阅读代码过程中，想知道某些具体函数的含义用法，如plat_ic_raise_el3_sgi&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>了解某些术语含义，如mpidr：Multiprocessor Affinity Register&lt;/li>
+&lt;/ol>
+&lt;p>code&lt;/p>
+&lt;ol>
+&lt;li>搭配software design及一些ATF启动相关的博客，按启动流程顺序来阅读&lt;/li>
+&lt;li>尝试修改其中部分接口，实现自己的功能，如smc中的fast call&lt;/li>
+&lt;/ol>
+&lt;p>tips&lt;/p>
+&lt;ol>
+&lt;li>快速检索某个符号
+&lt;ul>
+&lt;li>vscode：最左侧的放大镜搜索框，在项目内检索&lt;/li>
+&lt;li>Linux bash：grep “text” ./ -nr&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="编译-atf">编译 ATF&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">clone&lt;/span> &lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">github&lt;/span>.&lt;span style="color:#e06c75">com&lt;/span>/&lt;span style="color:#e5c07b">ARM-software&lt;/span>/&lt;span style="color:#e5c07b">arm-trusted&lt;/span>&lt;span style="color:#e06c75">-firmware&lt;/span>.&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">-b&lt;/span> &lt;span style="color:#e06c75">v2&lt;/span>.&lt;span style="color:#e06c75">7&lt;/span>.&lt;span style="color:#e06c75">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd arm-trusted&lt;/span>&lt;span style="color:#e06c75">-firmware&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">PLAT&lt;/span>=&lt;span style="color:#e06c75">qemu&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">DEBUG&lt;/span>=&lt;span style="color:#d19a66">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
+&lt;p>1.error: unrecognized command-line option ‘-mstrict-align’; did you mean ‘-Wstrict-aliasing’?&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 1005;
+flex-basis: 2414px"
+>
+&lt;a href="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37.png" data-size="1539x153">
+&lt;img src="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37.png"
+width="1539"
+height="153"
+srcset="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37_hu91aa95b88a8f9fb4bd9155c0fdf394eb_309778_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37_hu91aa95b88a8f9fb4bd9155c0fdf394eb_309778_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>It seems specify &lt;code>CROSS_COMPILE&lt;/code> by exporting it doesn&amp;rsquo;t work, instead, should be specified at build commandline, i.e:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">PLAT&lt;/span>=&lt;span style="color:#e06c75">qemu&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">DEBUG&lt;/span>=&lt;span style="color:#d19a66">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>2.failed to find romfile &amp;ldquo;efi-virtio.rom&amp;rdquo;&lt;/p></description></item><item><title>基于qemu+gdb，调试aarch64 linux内核</title><link>https://hyrtee.github.io/2023/debug-on-qemu/</link><pubDate>Sat, 22 Jul 2023 08:47:57 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-on-qemu/</guid><description>&lt;p>在之前搭建好aarch64工作环境的基础上，可以进行一系列开发调试工作，本文记录在qemu上使用gdb调试aarch64架构的linux内核代码。&lt;/p>
 &lt;h2 id="调试环境">调试环境&lt;/h2>
 &lt;ul>
 &lt;li>rootfs： 基于BusyBox 1.34.1，自制&lt;/li>
@@ -117,7 +170,7 @@ loading="lazy"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> │ │ (&lt;span style="color:#d19a66">131072&lt;/span>) &lt;span style="color:#c678dd">Default&lt;/span> &lt;span style="color:#e06c75">RAM&lt;/span> &lt;span style="color:#e06c75">disk&lt;/span> &lt;span style="color:#e06c75">size&lt;/span> (&lt;span style="color:#e06c75">kbytes&lt;/span>)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>then set &lt;code>root=/dev/ram&lt;/code> at kernel command line.&lt;/p>
 &lt;h3 id="requested-init-init-failed-error--8">Requested init /init failed (error -8)&lt;/h3>
-&lt;p>busybox should be built to Arm64 platform, instead x86-64 default. So rebuild and re-compile it.&lt;/p>
+&lt;p>busybox should be built to Arm64 platform, instead of x86-64 default. So rebuild and re-compile it.&lt;/p>
 &lt;h2 id="refs">refs&lt;/h2>
 &lt;p>&lt;a class="link" href="https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788" target="_blank" rel="noopener"
 >https://www.expoli.tech/articles/2023/07/05/QEMU-debugging-Linux-kernel-environment-construction#8d170449343c448d8b2938544218c788&lt;/a>&lt;/p>

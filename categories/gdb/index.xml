@@ -1,4 +1,57 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/linux/</link><description>Recent content in Linux on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 08:47:57 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试aarch64 linux内核</title><link>https://hyrtee.github.io/2023/debug-on-qemu/</link><pubDate>Sat, 22 Jul 2023 08:47:57 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-on-qemu/</guid><description>&lt;p>在之前搭建好aarch64工作环境的基础上，可以进行一系列开发调试工作，本文记录在qemu上使用gdb调试aarch64架构的linux内核代码。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>gdb on Hyrtee's Blog</title><link>https://hyrtee.github.io/categories/gdb/</link><description>Recent content in gdb on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 19:43:30 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/categories/gdb/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试ATF</title><link>https://hyrtee.github.io/2023/debug-atf-on-qemu/</link><pubDate>Sat, 22 Jul 2023 19:43:30 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-atf-on-qemu/</guid><description>&lt;p>没工作之前，连ATF是啥都不知道😑&lt;/p>
+&lt;h2 id="atf-简介">ATF 简介&lt;/h2>
+&lt;p>Arm Trusted Firmware，Arm可信固件，定义了secure world software中的一系列底层接口的参考实现。&lt;/p>
+&lt;h2 id="atf-上手">ATF 上手&lt;/h2>
+&lt;p>学习ATF之前，建议Documentation+code搭配食用。&lt;/p>
+&lt;p>Documentation&lt;/p>
+&lt;ol>
+&lt;li>入门：第一次认识ATF，初步了解它是做什么的&lt;/li>
+&lt;li>进阶
+&lt;ul>
+&lt;li>阅读代码过程中，想知道一些全局变量的含义用法，如PROGRAMMABLE_RESET_ADDRESS&lt;/li>
+&lt;li>阅读代码过程中，想知道某些具体函数的含义用法，如plat_ic_raise_el3_sgi&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>了解某些术语含义，如mpidr：Multiprocessor Affinity Register&lt;/li>
+&lt;/ol>
+&lt;p>code&lt;/p>
+&lt;ol>
+&lt;li>搭配software design及一些ATF启动相关的博客，按启动流程顺序来阅读&lt;/li>
+&lt;li>尝试修改其中部分接口，实现自己的功能，如smc中的fast call&lt;/li>
+&lt;/ol>
+&lt;p>tips&lt;/p>
+&lt;ol>
+&lt;li>快速检索某个符号
+&lt;ul>
+&lt;li>vscode：最左侧的放大镜搜索框，在项目内检索&lt;/li>
+&lt;li>Linux bash：grep “text” ./ -nr&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="编译-atf">编译 ATF&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">clone&lt;/span> &lt;span style="color:#e06c75">https&lt;/span>://&lt;span style="color:#e06c75">github&lt;/span>.&lt;span style="color:#e06c75">com&lt;/span>/&lt;span style="color:#e5c07b">ARM-software&lt;/span>/&lt;span style="color:#e5c07b">arm-trusted&lt;/span>&lt;span style="color:#e06c75">-firmware&lt;/span>.&lt;span style="color:#e06c75">git&lt;/span> &lt;span style="color:#e06c75">-b&lt;/span> &lt;span style="color:#e06c75">v2&lt;/span>.&lt;span style="color:#e06c75">7&lt;/span>.&lt;span style="color:#e06c75">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">cd arm-trusted&lt;/span>&lt;span style="color:#e06c75">-firmware&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">PLAT&lt;/span>=&lt;span style="color:#e06c75">qemu&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">DEBUG&lt;/span>=&lt;span style="color:#d19a66">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
+&lt;p>1.error: unrecognized command-line option ‘-mstrict-align’; did you mean ‘-Wstrict-aliasing’?&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 1005;
+flex-basis: 2414px"
+>
+&lt;a href="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37.png" data-size="1539x153">
+&lt;img src="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37.png"
+width="1539"
+height="153"
+srcset="https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37_hu91aa95b88a8f9fb4bd9155c0fdf394eb_309778_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/debug-atf-on-qemu/2023-07-23-10-32-37_hu91aa95b88a8f9fb4bd9155c0fdf394eb_309778_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>It seems specify &lt;code>CROSS_COMPILE&lt;/code> by exporting it doesn&amp;rsquo;t work, instead, should be specified at build commandline, i.e:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">make&lt;/span> &lt;span style="color:#e06c75">PLAT&lt;/span>=&lt;span style="color:#e06c75">qemu&lt;/span> &lt;span style="color:#e06c75">CROSS_COMPILE&lt;/span>=&lt;span style="color:#e5c07b">aarch64-linux&lt;/span>&lt;span style="color:#e06c75">-gnu&lt;/span>- &lt;span style="color:#e06c75">DEBUG&lt;/span>=&lt;span style="color:#d19a66">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>2.failed to find romfile &amp;ldquo;efi-virtio.rom&amp;rdquo;&lt;/p></description></item><item><title>基于qemu+gdb，调试aarch64 linux内核</title><link>https://hyrtee.github.io/2023/debug-on-qemu/</link><pubDate>Sat, 22 Jul 2023 08:47:57 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-on-qemu/</guid><description>&lt;p>在之前搭建好aarch64工作环境的基础上，可以进行一系列开发调试工作，本文记录在qemu上使用gdb调试aarch64架构的linux内核代码。&lt;/p>
 &lt;h2 id="调试环境">调试环境&lt;/h2>
 &lt;ul>
 &lt;li>rootfs： 基于BusyBox 1.34.1，自制&lt;/li>
@@ -126,224 +179,4 @@ loading="lazy"
 &lt;p>&lt;a class="link" href="http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs" target="_blank" rel="noopener"
 >http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs&lt;/a>&lt;/p>
 &lt;p>&lt;a class="link" href="http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs" target="_blank" rel="noopener"
->http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs&lt;/a>&lt;/p></description></item><item><title>Windows11 安装 WSL2</title><link>https://hyrtee.github.io/2023/install-wsl2-on-win11/</link><pubDate>Sun, 16 Jul 2023 09:06:51 +0800</pubDate><guid>https://hyrtee.github.io/2023/install-wsl2-on-win11/</guid><description>&lt;p>以前在windows上都是通过VMware开Linux，不仅需要破解，还慢。既然有了WSL2这种好东西，不得用起来😏。&lt;/p>
-&lt;p>之前在公司是装的WSL，结果好多功能用不了。。大意了，WSL2改进的不是一点点啊&lt;/p>
-&lt;p>PS：虽然windows安装WSL2的博客无数，但最好还是学着从&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener"
->official website&lt;/a>上一步步进行，博客类的仅供参考~&lt;/p>
-&lt;h2 id="pre-action">Pre-action&lt;/h2>
-&lt;p>enable windows11 WSL and hypervisor functions:&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 98;
-flex-basis: 236px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03.png" data-size="484x492">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03.png"
-width="484"
-height="492"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03_hu2be622bb6f59e68ee5b321dd55bd4d95_32694_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03_hu2be622bb6f59e68ee5b321dd55bd4d95_32694_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;h2 id="install-wsl-command">Install WSL command&lt;/h2>
-&lt;p>Open PowerShell or Windows Command Prompt &lt;strong>in administrator&lt;/strong>，enter the following command, The &amp;ndash;install command performs the following actions:&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>Enables the optional WSL and Virtual Machine Platform components&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Downloads and installs the latest Linux kernel&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Sets WSL 2 as the default&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Downloads and installs the Ubuntu Linux distribution (reboot may be required)&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-install&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 386;
-flex-basis: 926px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-37-04.png" data-size="946x245">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-37-04.png"
-width="946"
-height="245"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-37-04_hu0b03dea4228306bf9dc53cd31a2f75a8_29598_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-37-04_hu0b03dea4228306bf9dc53cd31a2f75a8_29598_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>Restart your windows&lt;/p>
-&lt;h2 id="change-the-default-linux-distribution-installed">Change the default Linux distribution installed&lt;/h2>
-&lt;p>see Linux distribution supported：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-list&lt;/span> -&lt;span style="color:#e06c75">-online&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 251;
-flex-basis: 602px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-52-23.png" data-size="962x383">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-52-23.png"
-width="962"
-height="383"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-52-23_hua829565fa8cae5f5ea905c9cce973848_37266_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-09-52-23_hua829565fa8cae5f5ea905c9cce973848_37266_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>for example, install Ubuntu 22.04：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-install&lt;/span> &lt;span style="color:#e06c75">-d&lt;/span> &lt;span style="color:#e06c75">Ubuntu&lt;/span>-&lt;span style="color:#d19a66">22.04&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>set a user account and password at the same time.&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 591;
-flex-basis: 1418px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-04-09.png" data-size="1076x182">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-04-09.png"
-width="1076"
-height="182"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-04-09_hu1dfc7e838c19e6a7580ae2526bbd3ea8_24548_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-04-09_hu1dfc7e838c19e6a7580ae2526bbd3ea8_24548_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>install successful&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 345;
-flex-basis: 828px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-06-12.png" data-size="973x282">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-06-12.png"
-width="973"
-height="282"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-06-12_huf801c1df459703a8ee2be0ae743028bf_27499_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-06-12_huf801c1df459703a8ee2be0ae743028bf_27499_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>check Linux and wsl verison&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> &lt;span style="color:#e06c75">-l&lt;/span> &lt;span style="color:#e06c75">-v&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 453;
-flex-basis: 1088px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-10-27.png" data-size="998x220">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-10-27.png"
-width="998"
-height="220"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-10-27_hu88f5ba48ab955ceedf27f051b50d77d2_21678_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-10-10-27_hu88f5ba48ab955ceedf27f051b50d77d2_21678_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>New Linux installations, installed using the wsl &amp;ndash;install command, will be set to WSL 2 by default.&lt;/p>
-&lt;h2 id="custom-shell-style">custom shell style&lt;/h2>
-&lt;h3 id="background-image">background image&lt;/h3>
-&lt;p>Settings → Profiles → Ubuntu 22.04.02 LTS → Additional settings → Appearance → Background image&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 313;
-flex-basis: 752px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-53-54.png" data-size="1286x410">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-53-54.png"
-width="1286"
-height="410"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-53-54_hu242cc45e481e93b062bc67670b8868f2_35821_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-53-54_hu242cc45e481e93b062bc67670b8868f2_35821_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>output：&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 185;
-flex-basis: 444px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-55-05.png" data-size="2560x1381">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-55-05.png"
-width="2560"
-height="1381"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-55-05_hu7a78a3a3e5a9749d95924bbc9cde4817_3615215_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-11-55-05_hu7a78a3a3e5a9749d95924bbc9cde4817_3615215_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>more setting options in Appearance, help yourself.&lt;/p>
-&lt;h2 id="move-wsl2-to-other-drives">move wsl2 to other drives&lt;/h2>
-&lt;p>To unregister and uninstall a WSL distribution:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-unregister&lt;/span> &amp;lt;&lt;span style="color:#e06c75">DistributionName&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>move Ubuntu22.04 to D:/&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-powershell" data-lang="powershell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-shutdown&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-export&lt;/span> &lt;span style="color:#e06c75">Ubuntu&lt;/span>-&lt;span style="color:#d19a66">22.04&lt;/span> &lt;span style="color:#e06c75">D:&lt;/span>\&lt;span style="color:#e06c75">develop&lt;/span>\&lt;span style="color:#e06c75">wsl2&lt;/span>\&lt;span style="color:#e06c75">export&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-unregister&lt;/span> &lt;span style="color:#e06c75">Ubuntu&lt;/span>-&lt;span style="color:#d19a66">22.04&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">wsl&lt;/span> -&lt;span style="color:#e06c75">-import&lt;/span> &lt;span style="color:#e06c75">Ubuntu&lt;/span>-&lt;span style="color:#d19a66">22.04&lt;/span> &lt;span style="color:#e06c75">D:&lt;/span>\&lt;span style="color:#e06c75">develop&lt;/span>\&lt;span style="color:#e06c75">wsl2&lt;/span>\&lt;span style="color:#e06c75">ubuntu22&lt;/span>-&lt;span style="color:#d19a66">04&lt;/span> &lt;span style="color:#e06c75">D:&lt;/span>\&lt;span style="color:#e06c75">develop&lt;/span>\&lt;span style="color:#e06c75">wsl2&lt;/span>\&lt;span style="color:#e06c75">export&lt;/span>.&lt;span style="color:#e06c75">tar&lt;/span> -&lt;span style="color:#e06c75">-version&lt;/span> &lt;span style="color:#d19a66">2&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 337;
-flex-basis: 809px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-23-25.png" data-size="1497x444">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-23-25.png"
-width="1497"
-height="444"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-23-25_hu60098ead3c988b8fd9fc92775fd3be46_797889_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-23-25_hu60098ead3c988b8fd9fc92775fd3be46_797889_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;h2 id="file-storage">File storage&lt;/h2>
-&lt;p>open Windows File Explorer, enter:&lt;code>\\wsl$&lt;/code>&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 354;
-flex-basis: 849px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-43-05.png" data-size="1363x385">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-43-05.png"
-width="1363"
-height="385"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-43-05_hu9658c63370566330d07ac3bdfd30b2a7_26872_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-43-05_hu9658c63370566330d07ac3bdfd30b2a7_26872_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;p>what&amp;rsquo;s more, you can also find your linux distribution in &lt;code>Linux&lt;/code> beside File Explorer left-bar:&lt;/p>
-&lt;p>&lt;figure
-class="gallery-image"
-style="
-flex-grow: 330;
-flex-basis: 792px"
->
-&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-45-01.png" data-size="1231x373">
-&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-45-01.png"
-width="1231"
-height="373"
-srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-45-01_hu58c6515beda8735676c6ff3896ff45f1_32477_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-16-15-45-01_hu58c6515beda8735676c6ff3896ff45f1_32477_1024x0_resize_box_3.png 1024w"
-loading="lazy"
->
-&lt;/a>
-&lt;/figure>&lt;/p>
-&lt;h2 id="qa">Q&amp;amp;A&lt;/h2>
-&lt;h3 id="error-code-xxx0x80072ee2">Error code: xxx/0x80072ee2&lt;/h3>
-&lt;p>科学上网&lt;/p>
-&lt;h2 id="refs">refs&lt;/h2>
-&lt;p>&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener"
->https://learn.microsoft.com/en-us/windows/wsl/install&lt;/a>&lt;/p></description></item></channel></rss>
+>http://loverpi.wikidot.com/faq:sbc:libre-aml-s805x-minimal-rootfs&lt;/a>&lt;/p></description></item></channel></rss>

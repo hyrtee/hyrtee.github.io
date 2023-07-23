@@ -2,6 +2,23 @@
 &lt;p>之前在公司是装的WSL，结果好多功能用不了。。大意了，WSL2改进的不是一点点啊&lt;/p>
 &lt;p>PS：虽然windows安装WSL2的博客无数，但最好还是学着从&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener"
 >official website&lt;/a>上一步步进行，博客类的仅供参考~&lt;/p>
+&lt;h2 id="pre-action">Pre-action&lt;/h2>
+&lt;p>enable windows11 WSL and hypervisor functions:&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 98;
+flex-basis: 236px"
+>
+&lt;a href="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03.png" data-size="484x492">
+&lt;img src="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03.png"
+width="484"
+height="492"
+srcset="https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03_hu2be622bb6f59e68ee5b321dd55bd4d95_32694_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/install-wsl2-on-win11/2023-07-23-20-22-03_hu2be622bb6f59e68ee5b321dd55bd4d95_32694_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
 &lt;h2 id="install-wsl-command">Install WSL command&lt;/h2>
 &lt;p>Open PowerShell or Windows Command Prompt &lt;strong>in administrator&lt;/strong>，enter the following command, The &amp;ndash;install command performs the following actions:&lt;/p>
 &lt;ul>
