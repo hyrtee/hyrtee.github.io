@@ -1,4 +1,362 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Jul 2023 19:43:30 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>基于qemu+gdb，调试ATF</title><link>https://hyrtee.github.io/2023/debug-atf-on-qemu/</link><pubDate>Sat, 22 Jul 2023 19:43:30 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-atf-on-qemu/</guid><description>&lt;p>没工作之前，连ATF是啥都不知道😑&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Hyrtee's Blog</title><link>https://hyrtee.github.io/post/</link><description>Recent content in Posts on Hyrtee's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 29 Jul 2023 10:49:19 +0800</lastBuildDate><atom:link href="https://hyrtee.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Hugo-个人博客添加打赏功能</title><link>https://hyrtee.github.io/2023/reward-support/</link><pubDate>Sat, 29 Jul 2023 10:49:19 +0800</pubDate><guid>https://hyrtee.github.io/2023/reward-support/</guid><description>&lt;p>在&lt;a class="link" href="https://hyrtee.github.io/about/" target="_blank" rel="noopener"
+>关于&lt;/a>栏中可知，作者是个搞嵌入式的，但学习能力实在重要，我更想将其称之为&lt;code>copy能力&lt;/code>，工作之后深有体会。可能刚入职还有些自学时间，但大部分时候都没有，需要自己快速上手公司代码，并实现或修改其中某些功能。不需要掌握得多深，能实现，功能正常，测试通过即可。当然，后期会编写很多代码，通过解决很多BUG，期间也会逐渐掌握。&lt;/p>
+&lt;p>有点跑题了。。。今天学习给博客添加打赏功能。&lt;/p>
+&lt;p>授人以鱼，不如授人以渔，以下是我这个前后端零基础的解决过程：&lt;/p>
+&lt;h2 id="在线搜索万能模板">在线搜索万能模板&lt;/h2>
+&lt;p>零基础可能有些夸张了哈哈，以前做过一些网页/app/微信小程序。打赏功能，分析下来，应该就是在html或js中添加逻辑代码，在css中添加渲染，由于只涉及到两个图片的展示，甚至连js都不需要，所以这类模板应该不能找。如下就是一份：&lt;/p>
+&lt;p>功能描述：默认显示一个“打赏”按钮，点开之后，出现微信和支付宝的收款码。&lt;/p>
+&lt;p>html代码：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;padding: 10px 0; margin: 20px auto; width: 100%; font-size:16px; text-align: center;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">button&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;rewardButton&amp;#34;&lt;/span> &lt;span style="color:#e06c75">disable&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;enable&amp;#34;&lt;/span> &lt;span style="color:#e06c75">onclick&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;var qr = document.getElementById(&amp;#39;QR&amp;#39;); if (qr.style.display === &amp;#39;none&amp;#39;) {qr.style.display=&amp;#39;block&amp;#39;;} else {qr.style.display=&amp;#39;none&amp;#39;}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;打赏&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">button&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;QR&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: none;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;https://github.com/hyrtee/hyrtee.github.io/blob/main/reward/alipay.png?raw=true&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;WeChat Pay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;微信打赏&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;https://github.com/hyrtee/hyrtee.github.io/blob/main/reward/alipay.png?raw=true&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;Alipay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;支付宝打赏&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>css代码：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-css" data-lang="css">&lt;span style="display:flex;">&lt;span>#&lt;span style="color:#e06c75">QR&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">padding-top&lt;/span>:&lt;span style="color:#d19a66">20&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#&lt;span style="color:#e06c75">QR&lt;/span> &lt;span style="color:#e06c75">a&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#&lt;span style="color:#e06c75">QR&lt;/span> &lt;span style="color:#e06c75">img&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">width&lt;/span>:&lt;span style="color:#d19a66">180&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">max-width&lt;/span>:&lt;span style="color:#d19a66">100&lt;/span>&lt;span style="color:#e5c07b">%&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">display&lt;/span>:&lt;span style="color:#e5c07b">inline-block&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin&lt;/span>:&lt;span style="color:#d19a66">.8&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span> &lt;span style="color:#d19a66">2&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span> &lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#d19a66">2&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#&lt;span style="color:#e06c75">rewardButton&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border&lt;/span>:&lt;span style="color:#d19a66">1&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span> &lt;span style="color:#e5c07b">solid&lt;/span> &lt;span style="color:#d19a66">#ccc&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">line-height&lt;/span>:&lt;span style="color:#d19a66">36&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">text-align&lt;/span>:&lt;span style="color:#e5c07b">center&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">height&lt;/span>:&lt;span style="color:#d19a66">36&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">display&lt;/span>:&lt;span style="color:#e5c07b">block&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border-radius&lt;/span>:&lt;span style="color:#d19a66">4&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">-webkit-&lt;/span>&lt;span style="color:#c678dd">transition-duration&lt;/span>:&lt;span style="color:#d19a66">.4&lt;/span>&lt;span style="color:#e5c07b">s&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">transition-duration&lt;/span>:&lt;span style="color:#d19a66">.4&lt;/span>&lt;span style="color:#e5c07b">s&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">background-color&lt;/span>:&lt;span style="color:#d19a66">#fff&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>:&lt;span style="color:#d19a66">#999&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#e5c07b">auto&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">padding&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#d19a66">25&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#&lt;span style="color:#e06c75">rewardButton&lt;/span>:&lt;span style="color:#61afef">hover&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>:&lt;span style="color:#d19a66">#f77b83&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border-color&lt;/span>:&lt;span style="color:#d19a66">#f77b83&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">outline-style&lt;/span>:&lt;span style="color:#e5c07b">none&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="适配hugo源码实现打赏功能">适配Hugo源码，实现打赏功能&lt;/h2>
+&lt;p>作者使用Hugo搭建博客，会更加简单，因为Hugo的项目框架清晰明了，易于查找特定文件。&lt;/p>
+&lt;h3 id="html">html&lt;/h3>
+&lt;p>先找到文章页底部的固定标志，比如copyright等。&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 531;
+flex-basis: 1274px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-18-08.png" data-size="1418x267">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-18-08.png"
+width="1418"
+height="267"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-18-08_hu75997872a9252c7b20a98fa0128a86b9_19468_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-18-08_hu75997872a9252c7b20a98fa0128a86b9_19468_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>在博客源码中搜索设置该copyright的html源文件（：如vscode）&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 175;
+flex-basis: 420px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-20-33.png" data-size="843x481">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-20-33.png"
+width="843"
+height="481"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-20-33_huea314d7a4fa9bade38316f3ec58ca1a2_76740_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-20-33_huea314d7a4fa9bade38316f3ec58ca1a2_76740_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>看到搜索结果，实在😂。。。Hugo的好用之处在于，使用config文件进行傻瓜式配置，这里的copyright也是，在config.yaml配置如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">article&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">math&lt;/span>: &lt;span style="color:#e5c07b">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">toc&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">readingTime&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">license&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">enabled&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">default&lt;/span>: Licensed under CC BY-NC-SA 4.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>鼬神有句名言：任何事物都有其破绽。此处的破绽就是&lt;code>article&lt;/code>、&lt;code>license&lt;/code>等关键字，因为处理copyright逻辑的代码，肯定也是根据这些关键字来配置的，比如判断enabled为true，就将default显示在前端上，诸如此类。&lt;/p>
+&lt;p>所以继续搜：license&lt;/p>
+&lt;p>发现这个layouts\partials\article\components\footer.html文件很可疑，很像处理copyright的html代码：&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 142;
+flex-basis: 340px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-28-56.png" data-size="807x568">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-28-56.png"
+width="807"
+height="568"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-28-56_huc9cfc5cebd7adc3c2f79d60dc5c22e75_98018_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-28-56_huc9cfc5cebd7adc3c2f79d60dc5c22e75_98018_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>{{ if and (.Site.Params.article.license.enabled) (not (eq .Params.license false)) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#e06c75">section&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;article-copyright&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ partial &amp;#34;helper/icon&amp;#34; &amp;#34;copyright&amp;#34; }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;{{ default .Site.Params.article.license.default .Params.license | markdownify }}&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#e06c75">section&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{{ end }}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>也有对enabled关键字的判断，所以将上面万能模板中的html代码，放到 &amp;lt; footer &amp;gt; 内的底部：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#e06c75">footer&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;article-footer&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ partial &amp;#34;article/components/tags&amp;#34; . }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if and (.Site.Params.article.license.enabled) (not (eq .Params.license false)) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">section&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;article-copyright&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ partial &amp;#34;helper/icon&amp;#34; &amp;#34;copyright&amp;#34; }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;{{ default .Site.Params.article.license.default .Params.license | markdownify }}&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">section&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{- if ne .Lastmod .Date -}}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">section&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;article-lastmod&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ partial &amp;#34;helper/icon&amp;#34; &amp;#34;clock&amp;#34; }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ T &amp;#34;article.lastUpdatedOn&amp;#34; }} {{ .Lastmod.Format ( or .Site.Params.dateFormat.lastUpdated &amp;#34;Jan 02, 2006 15:04 MST&amp;#34; ) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">section&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{- end -}}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#7f848e">&amp;lt;!-- 以下是新增的打赏代码 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;padding: 10px 0; margin: 20px auto; width: 100%; font-size:16px; text-align: center;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">button&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;rewardButton&amp;#34;&lt;/span> &lt;span style="color:#e06c75">disable&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;enable&amp;#34;&lt;/span> &lt;span style="color:#e06c75">onclick&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;var qr = document.getElementById(&amp;#39;QR&amp;#39;); if (qr.style.display === &amp;#39;none&amp;#39;) {qr.style.display=&amp;#39;block&amp;#39;;} else {qr.style.display=&amp;#39;none&amp;#39;}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;打赏&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">button&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;QR&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: none;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;https://github.com/hyrtee/hyrtee.github.io/blob/main/reward/alipay.png?raw=true&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;WeChat Pay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;微信打赏&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;https://github.com/hyrtee/hyrtee.github.io/blob/main/reward/alipay.png?raw=true&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;Alipay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;支付宝打赏&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#e06c75">footer&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="更新收款码src">更新收款码src&lt;/h2>
+&lt;p>特地用一小节来提醒：
+&lt;strong>更新收款码&lt;/strong>，&lt;strong>更新收款码&lt;/strong>，&lt;strong>更新收款码&lt;/strong>，别傻傻转到作者口袋里了。&lt;/p>
+&lt;h2 id="css">css&lt;/h2>
+&lt;p>上面copyright的html代码中，有几个class，应该就是定义在对应的css文件中了，继续搜索，如：article-copyright&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 126;
+flex-basis: 302px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-36-58.png" data-size="823x652">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-36-58.png"
+width="823"
+height="652"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-36-58_hu7481553f1cc9720a19590d968fdb4158_115022_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-36-58_hu7481553f1cc9720a19590d968fdb4158_115022_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>搜索结果中，有俩，看第一个就行，第二个是theme模板中的，没用上。&lt;/p>
+&lt;p>添加到.article-copyright的下方：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-css" data-lang="css">&lt;span style="display:flex;">&lt;span>.&lt;span style="color:#e5c07b">article-footer&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin&lt;/span>: &lt;span style="color:#61afef;font-weight:bold">var&lt;/span>(&lt;span style="color:#56b6c2">--&lt;/span>&lt;span style="color:#e06c75">card&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e06c75">padding&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin-top&lt;/span>: &lt;span style="color:#d19a66">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">section&lt;/span>:&lt;span style="color:#61afef;font-weight:bold">not&lt;/span>(:&lt;span style="color:#e5c07b">first&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e06c75">child&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin-top&lt;/span>&lt;span style="color:#56b6c2">:&lt;/span> &lt;span style="color:#61afef;font-weight:bold">var&lt;/span>(&lt;span style="color:#56b6c2">--&lt;/span>&lt;span style="color:#e06c75">card&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e06c75">padding&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">section&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>: &lt;span style="color:#61afef;font-weight:bold">var&lt;/span>(&lt;span style="color:#56b6c2">--&lt;/span>&lt;span style="color:#e06c75">card&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e5c07b">text&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e5c07b">color&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e06c75">tertiary&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">text-transform&lt;/span>: &lt;span style="color:#e5c07b">uppercase&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">display&lt;/span>: &lt;span style="color:#e5c07b">flex&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">align-items&lt;/span>: &lt;span style="color:#e5c07b">center&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">font-size&lt;/span>: &lt;span style="color:#d19a66">1.4&lt;/span>&lt;span style="color:#e5c07b">rem&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> svg {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">width&lt;/span>: &lt;span style="color:#d19a66">20&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">height&lt;/span>: &lt;span style="color:#d19a66">20&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin-right&lt;/span>: &lt;span style="color:#d19a66">15&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">stroke-width&lt;/span>: &lt;span style="color:#d19a66">1.33&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> .&lt;span style="color:#e5c07b">article-tags&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">flex-wrap&lt;/span>: &lt;span style="color:#e5c07b">wrap&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">text-transform&lt;/span>: &lt;span style="color:#e5c07b">unset&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> .&lt;span style="color:#e5c07b">article-copyright&lt;/span>&lt;span style="color:#56b6c2">,&lt;/span> .&lt;span style="color:#e5c07b">article-lastmod&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>: &lt;span style="color:#61afef;font-weight:bold">var&lt;/span>(&lt;span style="color:#56b6c2">--&lt;/span>&lt;span style="color:#e06c75">body&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e5c07b">text&lt;/span>&lt;span style="color:#56b6c2">-&lt;/span>&lt;span style="color:#e5c07b">color&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#7f848e">/* 以下是新增的打赏代码 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> #&lt;span style="color:#e06c75">QR&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">padding-top&lt;/span>:&lt;span style="color:#d19a66">20&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> #&lt;span style="color:#e06c75">QR&lt;/span> &lt;span style="color:#e06c75">a&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> #&lt;span style="color:#e06c75">QR&lt;/span> &lt;span style="color:#e06c75">img&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">width&lt;/span>:&lt;span style="color:#d19a66">180&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">max-width&lt;/span>:&lt;span style="color:#d19a66">100&lt;/span>&lt;span style="color:#e5c07b">%&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">display&lt;/span>:&lt;span style="color:#e5c07b">inline-block&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin&lt;/span>:&lt;span style="color:#d19a66">.8&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span> &lt;span style="color:#d19a66">2&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span> &lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#d19a66">2&lt;/span>&lt;span style="color:#e5c07b">em&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> #&lt;span style="color:#e06c75">rewardButton&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border&lt;/span>:&lt;span style="color:#d19a66">1&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span> &lt;span style="color:#e5c07b">solid&lt;/span> &lt;span style="color:#d19a66">#ccc&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">line-height&lt;/span>:&lt;span style="color:#d19a66">36&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">text-align&lt;/span>:&lt;span style="color:#e5c07b">center&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">height&lt;/span>:&lt;span style="color:#d19a66">36&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">display&lt;/span>:&lt;span style="color:#e5c07b">block&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border-radius&lt;/span>:&lt;span style="color:#d19a66">4&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">-webkit-&lt;/span>&lt;span style="color:#c678dd">transition-duration&lt;/span>:&lt;span style="color:#d19a66">.4&lt;/span>&lt;span style="color:#e5c07b">s&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">transition-duration&lt;/span>:&lt;span style="color:#d19a66">.4&lt;/span>&lt;span style="color:#e5c07b">s&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">background-color&lt;/span>:&lt;span style="color:#d19a66">#ffffff&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>:&lt;span style="color:#d19a66">#292929&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">margin&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#e5c07b">auto&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">padding&lt;/span>:&lt;span style="color:#d19a66">0&lt;/span> &lt;span style="color:#d19a66">25&lt;/span>&lt;span style="color:#e5c07b">px&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> #&lt;span style="color:#e06c75">rewardButton&lt;/span>:&lt;span style="color:#61afef">hover&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">color&lt;/span>:&lt;span style="color:#d19a66">#f77b83&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">border-color&lt;/span>:&lt;span style="color:#d19a66">#f77b83&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#c678dd">outline-style&lt;/span>:&lt;span style="color:#e5c07b">none&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>以上就改好了，本地 hugo server -w 测试一波：&lt;/p>
+&lt;p>初始&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 413;
+flex-basis: 993px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-07.png" data-size="1188x287">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-07.png"
+width="1188"
+height="287"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-07_hu0e58138332576f04c1cb47d31f022059_17730_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-07_hu0e58138332576f04c1cb47d31f022059_17730_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>点击后&lt;/p>
+&lt;p>&lt;figure
+class="gallery-image"
+style="
+flex-grow: 188;
+flex-basis: 453px"
+>
+&lt;a href="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-49.png" data-size="1158x613">
+&lt;img src="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-49.png"
+width="1158"
+height="613"
+srcset="https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-49_hu5702834632bac9dfd7158429c82072ac_116915_480x0_resize_box_3.png 480w, https://hyrtee.github.io/2023/reward-support/2023-07-29-11-45-49_hu5702834632bac9dfd7158429c82072ac_116915_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>想和Hugo的config一样，轻松配置收款码图片吗？那就继续👇&lt;/p>
+&lt;h2 id="config灵活配置">config灵活配置&lt;/h2>
+&lt;p>找个现成的config例子，仿照改写。&lt;/p>
+&lt;p>头像就蛮不错的：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">sidebar&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">emoji&lt;/span>: 🍥
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">subtitle&lt;/span>: MARiA? yyds!
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">avatar&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">enabled&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">local&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">src&lt;/span>: img/head1.jpeg
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="自定义-config">自定义 config&lt;/h3>
+&lt;p>根据上面的avatar config，自定义一份reward的config&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e06c75">reward&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">enabled&lt;/span>: &lt;span style="color:#e5c07b">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">wechat_src&lt;/span>: reward/wechatpay.png
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">alipay_src&lt;/span>: reward/alipay.png
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>收款码图片需要同步到项目下的assets/reward目录&lt;/p>
+&lt;h3 id="自定义-html-逻辑">自定义 html 逻辑&lt;/h3>
+&lt;p>和上面如出一辙，搜索avatar，找到对应html文件layouts\partials\sidebar\left.html&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>{{ with .Site.Params.sidebar.avatar }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if (default true .enabled) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">figure&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;site-avatar&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">href&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ .Site.BaseURL | relLangURL }}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if not .local }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ .src }}&amp;#34;&lt;/span> &lt;span style="color:#e06c75">width&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;300&amp;#34;&lt;/span> &lt;span style="color:#e06c75">height&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;300&amp;#34;&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;site-logo&amp;#34;&lt;/span> &lt;span style="color:#e06c75">loading&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;lazy&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;Avatar&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ else }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ $avatar := resources.Get (.src) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if $avatar }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ $avatarResized := $avatar.Resize &amp;#34;300x&amp;#34; }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ $avatarResized.RelPermalink }}&amp;#34;&lt;/span> &lt;span style="color:#e06c75">width&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ $avatarResized.Width }}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">height&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ $avatarResized.Height }}&amp;#34;&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;site-logo&amp;#34;&lt;/span> &lt;span style="color:#e06c75">loading&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;lazy&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;Avatar&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ else }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ errorf &amp;#34;Failed loading avatar from %q&amp;#34; . }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ with $.Site.Params.sidebar.emoji }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;emoji&amp;#34;&lt;/span>&amp;gt;{{ . }}&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">figure&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{{ end }}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>仿写过程就不细讲了，可以作为一个锻炼自己的过程。以下是仿写好的打赏代码：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>{{ with .Site.Params.reward }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if (default true .enabled) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ $wechat := resources.Get (.wechat_src) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ $alipay := resources.Get (.alipay_src) }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;padding: 10px 0; margin: 20px auto; width: 100%; font-size:16px; text-align: center;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">button&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;rewardButton&amp;#34;&lt;/span> &lt;span style="color:#e06c75">disable&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;enable&amp;#34;&lt;/span> &lt;span style="color:#e06c75">onclick&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;var qr = document.getElementById(&amp;#39;QR&amp;#39;); if (qr.style.display === &amp;#39;none&amp;#39;) {qr.style.display=&amp;#39;block&amp;#39;;} else {qr.style.display=&amp;#39;none&amp;#39;}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;打赏&amp;lt;/&lt;span style="color:#e06c75">span&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">button&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;QR&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: none;&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if $wechat }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;wechat_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ $wechat.RelPermalink }}&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;WeChat Pay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;微信&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ else }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ errorf &amp;#34;Failed loading reward wechat img from %q&amp;#34; . }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ if $alipay }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">div&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay&amp;#34;&lt;/span> &lt;span style="color:#e06c75">style&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;display: inline-block&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">a&lt;/span> &lt;span style="color:#e06c75">class&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;fancybox&amp;#34;&lt;/span> &lt;span style="color:#e06c75">rel&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;group&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">img&lt;/span> &lt;span style="color:#e06c75">id&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;alipay_qr&amp;#34;&lt;/span> &lt;span style="color:#e06c75">src&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;{{ $alipay.RelPermalink }}&amp;#34;&lt;/span> &lt;span style="color:#e06c75">alt&lt;/span>&lt;span style="color:#56b6c2">=&lt;/span>&lt;span style="color:#98c379">&amp;#34;Alipay&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#e06c75">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;支付宝&amp;lt;/&lt;span style="color:#e06c75">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ else }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ errorf &amp;#34;Failed loading reward alipay img from %q&amp;#34; . }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#e06c75">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {{ end }}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{{ end }}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将其替换到layouts\partials\article\components\footer.html相应位置即可。&lt;/p>
+&lt;p>实际效果，和初版的一致。&lt;/p></description></item><item><title>基于qemu+gdb，调试ATF</title><link>https://hyrtee.github.io/2023/debug-atf-on-qemu/</link><pubDate>Sat, 22 Jul 2023 19:43:30 +0800</pubDate><guid>https://hyrtee.github.io/2023/debug-atf-on-qemu/</guid><description>&lt;p>没工作之前，连ATF是啥都不知道😑&lt;/p>
 &lt;h2 id="atf-简介">ATF 简介&lt;/h2>
 &lt;p>Arm Trusted Firmware，Arm可信固件，定义了secure world software中的一系列底层接口的参考实现。&lt;/p>
 &lt;h2 id="atf-上手">ATF 上手&lt;/h2>
